@@ -5,6 +5,7 @@ import { ShoeModel } from './ShoeModel'
 import { useNoiseStore } from '../state/useNoiseStore'
 import { CanvasLoader } from './CanvasLoader'
 import { FalloffHandle } from './FalloffHandle'
+import { GroundGrid } from './GroundGrid'
 
 export const ShoeCanvas = () => {
   const params = useNoiseStore((state) => state.params)
@@ -22,6 +23,7 @@ export const ShoeCanvas = () => {
         <Suspense fallback={<CanvasLoader />}>
           <ShoeModel params={params} toggles={toggles} />
           <FalloffHandle />
+          <GroundGrid />
         </Suspense>
         <OrbitControls autoRotate={toggles.autoRotate} enabled={!falloffDragging} />
       </Canvas>

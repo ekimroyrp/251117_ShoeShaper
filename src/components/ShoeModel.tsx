@@ -358,14 +358,6 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
   return (
     <group position={[0, -1.2, 0]}>
       <mesh geometry={displacedGeometry} material={material} castShadow receiveShadow />
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, FLOOR_Y, 0]} receiveShadow>
-        <planeGeometry args={[24, 24, 1, 1]} />
-        <meshStandardMaterial color="#021108" transparent opacity={0.92} />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, FLOOR_Y + 0.01, 0]}>
-        <ringGeometry args={[1.6, 7, 64]} />
-        <meshBasicMaterial color="#0aff8a" opacity={0.08} transparent />
-      </mesh>
     </group>
   )
 }
