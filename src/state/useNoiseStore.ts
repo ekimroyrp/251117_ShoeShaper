@@ -38,8 +38,8 @@ export interface SliderDefinition {
 
 export const sliderDefinitions: SliderDefinition[] = [
   { key: 'amplitude', label: 'Displacement', min: 0, max: 6, step: 0.05, precision: 2 },
-  { key: 'frequency', label: 'Frequency', min: 0.15, max: 4, step: 0.05, precision: 2 },
-  { key: 'roughness', label: 'Roughness', min: 0.2, max: 1.6, step: 0.05, precision: 2 },
+  { key: 'frequency', label: 'Frequency', min: 0, max: 4, step: 0.05, precision: 2 },
+  { key: 'roughness', label: 'Roughness', min: 0, max: 1.6, step: 0.05, precision: 2 },
   { key: 'warp', label: 'Warp', min: 0, max: 2.5, step: 0.05, precision: 2 },
   { key: 'ridge', label: 'Ridge', min: 0, max: 1, step: 0.02, precision: 2 },
   { key: 'seed', label: 'Seed', min: 1, max: 9999, step: 1, precision: 0 },
@@ -61,16 +61,16 @@ interface NoiseStoreState {
 
 const defaultParams: NoiseParams = {
   seed: 1337,
-  amplitude: 2.5,
-  frequency: 1.4,
-  roughness: 0.8,
-  warp: 0.4,
-  ridge: 0.25,
+  amplitude: 0,
+  frequency: 0,
+  roughness: 0,
+  warp: 0,
+  ridge: 0,
   noiseType: 'simplex',
 }
 
 const defaultToggles: NoiseToggles = {
-  autoRotate: true,
+  autoRotate: false,
   wireframe: false,
 }
 
