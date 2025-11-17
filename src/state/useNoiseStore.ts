@@ -44,12 +44,12 @@ export interface SliderDefinition {
 
 export const sliderDefinitions: SliderDefinition[] = [
   { key: 'amplitude', label: 'Displacement', min: 0, max: 6, step: 0.05, precision: 2 },
+  { key: 'falloff', label: 'FALLOFF', min: 0, max: 10, step: 0.05, precision: 2 },
   { key: 'clamp', label: 'CLAMP', min: 0, max: 6, step: 0.05, precision: 2 },
   { key: 'frequency', label: 'Frequency', min: 0, max: 4, step: 0.05, precision: 2 },
   { key: 'roughness', label: 'Roughness', min: 0, max: 1.6, step: 0.05, precision: 2 },
   { key: 'warp', label: 'Warp', min: 0, max: 2.5, step: 0.05, precision: 2 },
   { key: 'ridge', label: 'Ridge', min: 0, max: 1, step: 0.02, precision: 2 },
-  { key: 'falloff', label: 'FALLOFF', min: 0, max: 2, step: 0.05, precision: 2 },
   { key: 'seed', label: 'Seed', min: 1, max: 9999, step: 1, precision: 0 },
 ]
 

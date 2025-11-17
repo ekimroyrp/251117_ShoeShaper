@@ -1,6 +1,6 @@
 import { useMemo, useRef } from 'react'
 import type { ThreeEvent } from '@react-three/fiber'
-import { Plane, Vector3 } from 'three'
+import { AdditiveBlending, Plane, Vector3 } from 'three'
 import { useNoiseStore } from '../state/useNoiseStore'
 import { FLOOR_Y } from '../constants/environment'
 
@@ -103,6 +103,20 @@ export const FalloffHandle = () => {
       >
         <sphereGeometry args={[HANDLE_RADIUS, 32, 32]} />
         <meshStandardMaterial color="#ff1a1a" emissive="#ff0000" emissiveIntensity={0.75} />
+      </mesh>
+      <mesh
+        position={[falloffCenterX, HANDLE_Y, falloffCenterZ]}
+        scale={1.5}
+        raycast={() => null}
+      >
+        <sphereGeometry args={[HANDLE_RADIUS, 32, 32]} />
+        <meshBasicMaterial
+          color="#ff3b3b"
+          transparent
+          opacity={0.45}
+          depthWrite={false}
+          blending={AdditiveBlending}
+        />
       </mesh>
     </group>
   )
