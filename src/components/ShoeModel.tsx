@@ -133,12 +133,19 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     const simplex = createNoiseGenerator(params.seed)
     const normal = new Vector3()
     const position = new Vector3()
+    const clampLimit = Math.max(0, params.clamp ?? 0)
 
     for (let i = 0; i < positions.count; i += 1) {
       position.set(positions.getX(i), positions.getY(i), positions.getZ(i))
       const sample = sampleNoise(simplex, params.noiseType, position, params)
       normal.set(normals.getX(i), normals.getY(i), normals.getZ(i)).normalize()
-      const offset = sample * params.amplitude
+      const rawOffset = sample * params.amplitude
+      const offset =
+        clampLimit === 0
+          ? 0
+          : clampLimit > 0 && Math.abs(rawOffset) > clampLimit
+            ? Math.sign(rawOffset) * clampLimit
+            : rawOffset
       displacements[i * 3] = normal.x * offset
       displacements[i * 3 + 1] = normal.y * offset
       displacements[i * 3 + 2] = normal.z * offset
@@ -168,6 +175,7 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     return weldGeometry(geometry)
   }, [
     params.amplitude,
+    params.clamp,
     params.frequency,
     params.noiseType,
     params.ridge,

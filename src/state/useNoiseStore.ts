@@ -7,6 +7,7 @@ export type NoiseAlgorithm = (typeof noiseAlgorithms)[number]
 export interface NoiseParams {
   seed: number
   amplitude: number
+  clamp: number
   frequency: number
   roughness: number
   warp: number
@@ -38,6 +39,7 @@ export interface SliderDefinition {
 
 export const sliderDefinitions: SliderDefinition[] = [
   { key: 'amplitude', label: 'Displacement', min: 0, max: 6, step: 0.05, precision: 2 },
+  { key: 'clamp', label: 'CLAMP', min: 0, max: 6, step: 0.05, precision: 2 },
   { key: 'frequency', label: 'Frequency', min: 0, max: 4, step: 0.05, precision: 2 },
   { key: 'roughness', label: 'Roughness', min: 0, max: 1.6, step: 0.05, precision: 2 },
   { key: 'warp', label: 'Warp', min: 0, max: 2.5, step: 0.05, precision: 2 },
@@ -62,6 +64,7 @@ interface NoiseStoreState {
 const defaultParams: NoiseParams = {
   seed: 1337,
   amplitude: 0,
+  clamp: 0,
   frequency: 0,
   roughness: 0,
   warp: 0,
@@ -76,7 +79,10 @@ const defaultToggles: NoiseToggles = {
 
 const storageKey = 'shoeshaper-presets'
 
-const cloneParams = (params: NoiseParams): NoiseParams => ({ ...params })
+const cloneParams = (params: NoiseParams = defaultParams): NoiseParams => ({
+  ...defaultParams,
+  ...params,
+})
 const cloneToggles = (toggles: NoiseToggles): NoiseToggles => ({ ...toggles })
 
 const readPresets = (): SavedPreset[] => {
