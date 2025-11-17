@@ -4,10 +4,12 @@ import { Environment, OrbitControls } from '@react-three/drei'
 import { ShoeModel } from './ShoeModel'
 import { useNoiseStore } from '../state/useNoiseStore'
 import { CanvasLoader } from './CanvasLoader'
+import { FalloffHandle } from './FalloffHandle'
 
 export const ShoeCanvas = () => {
   const params = useNoiseStore((state) => state.params)
   const toggles = useNoiseStore((state) => state.toggles)
+  const falloffDragging = useNoiseStore((state) => state.falloffDragging)
 
   return (
     <section className="canvas-shell">
@@ -19,8 +21,9 @@ export const ShoeCanvas = () => {
         <Environment preset="night" />
         <Suspense fallback={<CanvasLoader />}>
           <ShoeModel params={params} toggles={toggles} />
+          <FalloffHandle />
         </Suspense>
-        <OrbitControls autoRotate={toggles.autoRotate} />
+        <OrbitControls autoRotate={toggles.autoRotate} enabled={!falloffDragging} />
       </Canvas>
     </section>
   )

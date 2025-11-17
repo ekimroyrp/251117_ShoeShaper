@@ -16,6 +16,7 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { createNoise3D, type NoiseFunction3D } from 'simplex-noise'
 import seedrandom from 'seedrandom'
 import type { NoiseParams, NoiseToggles } from '../state/useNoiseStore'
+import { FLOOR_CLEARANCE, FLOOR_Y } from '../constants/environment'
 
 const WELD_TOLERANCE = 1e-4
 
@@ -265,12 +266,30 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     const normal = new Vector3()
     const position = new Vector3()
     const clampLimit = Math.max(0, params.clamp ?? 0)
+    const falloffCenter = new Vector3(params.falloffCenterX, FLOOR_Y, params.falloffCenterZ)
+    const falloffDistances = new Float32Array(positions.count)
+    let maxDistance = 0
+
+    for (let i = 0; i < positions.count; i += 1) {
+      position.set(positions.getX(i), positions.getY(i), positions.getZ(i))
+      const distance = falloffCenter.distanceTo(position)
+      falloffDistances[i] = distance
+      if (distance > maxDistance) {
+        maxDistance = distance
+      }
+    }
+
+    const invMaxDistance = maxDistance > 0 ? 1 / maxDistance : 0
+    const falloffExponent = 1 + Math.max(0, params.falloff ?? 0)
 
     for (let i = 0; i < positions.count; i += 1) {
       position.set(positions.getX(i), positions.getY(i), positions.getZ(i))
       const sample = sampleNoise(simplex, params.noiseType, position, params)
       normal.set(normals.getX(i), normals.getY(i), normals.getZ(i)).normalize()
-      const rawOffset = sample * params.amplitude
+      const normalizedDistance =
+        invMaxDistance === 0 ? 0 : Math.min(1, falloffDistances[i] * invMaxDistance)
+      const falloffWeight = Math.pow(normalizedDistance, falloffExponent)
+      const rawOffset = sample * params.amplitude * falloffWeight
       const offset =
         clampLimit === 0
           ? 0
@@ -293,11 +312,9 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     positions.needsUpdate = true
     geometry.computeVertexNormals()
 
-    const planeY = -1.15
-    const clearance = 0.02
     geometry.computeBoundingBox()
     const minY = geometry.boundingBox?.min.y ?? 0
-    const lift = planeY + clearance - minY
+    const lift = FLOOR_Y + FLOOR_CLEARANCE - minY
     if (lift > 0) {
       geometry.translate(0, lift, 0)
       geometry.computeBoundingBox()
@@ -307,6 +324,9 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
   }, [
     params.amplitude,
     params.clamp,
+    params.falloff,
+    params.falloffCenterX,
+    params.falloffCenterZ,
     params.frequency,
     params.noiseType,
     params.ridge,
@@ -338,15 +358,11 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
   return (
     <group position={[0, -1.2, 0]}>
       <mesh geometry={displacedGeometry} material={material} castShadow receiveShadow />
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, -1.15, 0]}
-        receiveShadow
-      >
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, FLOOR_Y, 0]} receiveShadow>
         <planeGeometry args={[24, 24, 1, 1]} />
         <meshStandardMaterial color="#021108" transparent opacity={0.92} />
       </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.14, 0]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, FLOOR_Y + 0.01, 0]}>
         <ringGeometry args={[1.6, 7, 64]} />
         <meshBasicMaterial color="#0aff8a" opacity={0.08} transparent />
       </mesh>

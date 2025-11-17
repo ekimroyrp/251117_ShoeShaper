@@ -9,6 +9,9 @@ export interface NoiseParams {
   amplitude: number
   clamp: number
   resolution: number
+  falloff: number
+  falloffCenterX: number
+  falloffCenterZ: number
   frequency: number
   roughness: number
   warp: number
@@ -28,7 +31,7 @@ export interface SavedPreset {
 }
 
 type NumericParamKey = Exclude<keyof NoiseParams, 'noiseType'>
-type SliderParamKey = Exclude<NumericParamKey, 'resolution'>
+type SliderParamKey = Exclude<NumericParamKey, 'resolution' | 'falloffCenterX' | 'falloffCenterZ'>
 
 export interface SliderDefinition {
   key: SliderParamKey
@@ -46,6 +49,7 @@ export const sliderDefinitions: SliderDefinition[] = [
   { key: 'roughness', label: 'Roughness', min: 0, max: 1.6, step: 0.05, precision: 2 },
   { key: 'warp', label: 'Warp', min: 0, max: 2.5, step: 0.05, precision: 2 },
   { key: 'ridge', label: 'Ridge', min: 0, max: 1, step: 0.02, precision: 2 },
+  { key: 'falloff', label: 'FALLOFF', min: 0, max: 2, step: 0.05, precision: 2 },
   { key: 'seed', label: 'Seed', min: 1, max: 9999, step: 1, precision: 0 },
 ]
 
@@ -61,11 +65,14 @@ interface NoiseStoreState {
   params: NoiseParams
   toggles: NoiseToggles
   presets: SavedPreset[]
+  falloffDragging: boolean
   setParam: (key: NumericParamKey, value: number) => void
   setNoiseType: (algorithm: NoiseAlgorithm) => void
   randomizeSeed: () => void
   resetParams: () => void
   toggleFlag: (flag: keyof NoiseToggles) => void
+  setFalloffCenter: (x: number, z: number) => void
+  setFalloffDragging: (dragging: boolean) => void
   savePreset: (name: string) => void
   loadPreset: (id: string) => void
   deletePreset: (id: string) => void
@@ -76,6 +83,9 @@ const defaultParams: NoiseParams = {
   amplitude: 0,
   clamp: 0,
   resolution: 0,
+  falloff: 0,
+  falloffCenterX: 0,
+  falloffCenterZ: -16,
   frequency: 0,
   roughness: 0,
   warp: 0,
@@ -144,6 +154,7 @@ export const useNoiseStore = create<NoiseStoreState>((set) => ({
   params: cloneParams(defaultParams),
   toggles: cloneToggles(defaultToggles),
   presets: readPresets(),
+  falloffDragging: false,
   setParam: (key, value) =>
     set((state) => ({
       params: {
@@ -174,6 +185,7 @@ export const useNoiseStore = create<NoiseStoreState>((set) => ({
     set(() => ({
       params: cloneParams(defaultParams),
       toggles: cloneToggles(defaultToggles),
+      falloffDragging: false,
     })),
   toggleFlag: (flag) =>
     set((state) => ({
@@ -181,6 +193,18 @@ export const useNoiseStore = create<NoiseStoreState>((set) => ({
         ...state.toggles,
         [flag]: !state.toggles[flag],
       },
+    })),
+  setFalloffCenter: (x, z) =>
+    set((state) => ({
+      params: {
+        ...state.params,
+        falloffCenterX: x,
+        falloffCenterZ: z,
+      },
+    })),
+  setFalloffDragging: (dragging) =>
+    set(() => ({
+      falloffDragging: dragging,
     })),
   savePreset: (name) => {
     const trimmed = name.trim()
