@@ -10,6 +10,7 @@ import {
   type SliderParamKey,
   useNoiseStore,
 } from '../state/useNoiseStore'
+import { SelectField } from './SelectField'
 
 export const NoiseControlPanel = () => {
   const {
@@ -46,43 +47,22 @@ export const NoiseControlPanel = () => {
 
   return (
     <aside className="control-panel">
-      <div className="panel-section">
-        <label className="panel-label" htmlFor="mesh-resolution">
-          RESOLUTION
-        </label>
-        <div className="select-shell">
-          <select
-            id="mesh-resolution"
-            value={params.resolution}
-            onChange={(event) => setParam('resolution', Number(event.target.value))}
-          >
-            {resolutionOptions.map((level) => (
-              <option key={level} value={level}>
-                Level {level}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+      <SelectField
+        label="RESOLUTION"
+        value={params.resolution}
+        onSelect={(next) => setParam('resolution', next)}
+        options={resolutionOptions.map((level) => ({ label: `Level ${level}`, value: level }))}
+      />
 
-      <div className="panel-section">
-        <label className="panel-label" htmlFor="noise-type">
-          Noise Mode
-        </label>
-        <div className="select-shell">
-          <select
-            id="noise-type"
-            value={params.noiseType}
-            onChange={(event) => setNoiseType(event.target.value as typeof params.noiseType)}
-          >
-            {noiseAlgorithms.map((algorithm) => (
-              <option key={algorithm} value={algorithm}>
-                {algorithm.toUpperCase()}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+      <SelectField
+        label="Noise Mode"
+        value={params.noiseType}
+        onSelect={(next) => setNoiseType(next)}
+        options={noiseAlgorithms.map((algorithm) => ({
+          label: algorithm.toUpperCase(),
+          value: algorithm,
+        }))}
+      />
 
       <div className="panel-grid">
         {orderedSliderKeys.map((key) => {
