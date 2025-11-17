@@ -130,6 +130,17 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
 
     positions.needsUpdate = true
     geometry.computeVertexNormals()
+
+    const planeY = -1.15
+    const clearance = 0.02
+    geometry.computeBoundingBox()
+    const minY = geometry.boundingBox?.min.y ?? 0
+    const lift = planeY + clearance - minY
+    if (lift > 0) {
+      geometry.translate(0, lift, 0)
+      geometry.computeBoundingBox()
+    }
+
     return geometry
   }, [
     remeshedGeometry,
