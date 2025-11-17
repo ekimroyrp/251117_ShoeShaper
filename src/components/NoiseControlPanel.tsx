@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { CyberSlider } from './CyberSlider'
 import {
   noiseAlgorithms,
+  resolutionOptions,
   sliderDefinitions,
   useNoiseStore,
 } from '../state/useNoiseStore'
@@ -35,6 +36,25 @@ export const NoiseControlPanel = () => {
       <div className="panel-header">
         <h1>ShoeShaper</h1>
         <p>Cyberpunk noise lab — sculpt the base mesh with displacement fields.</p>
+      </div>
+
+      <div className="panel-section">
+        <label className="panel-label" htmlFor="mesh-resolution">
+          RESOLUTION
+        </label>
+        <div className="select-shell">
+          <select
+            id="mesh-resolution"
+            value={params.resolution}
+            onChange={(event) => setParam('resolution', Number(event.target.value))}
+          >
+            {resolutionOptions.map((level) => (
+              <option key={level} value={level}>
+                Level {level}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="panel-section">

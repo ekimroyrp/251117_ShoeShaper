@@ -8,6 +8,7 @@ import {
   Group,
   Mesh,
   MeshStandardMaterial,
+  Vector2,
   Vector3,
 } from 'three'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
@@ -48,6 +49,126 @@ const weldGeometry = (geometry: BufferGeometry, tolerance = WELD_TOLERANCE) => {
   result.setIndex(nextIndices)
   result.computeVertexNormals()
   return result
+}
+
+const subdivideGeometry = (geometry: BufferGeometry, levels: number) => {
+  if (levels <= 0) {
+    return geometry
+  }
+
+  let current = geometry
+  const va = new Vector3()
+  const vb = new Vector3()
+  const vc = new Vector3()
+  const vab = new Vector3()
+  const vbc = new Vector3()
+  const vca = new Vector3()
+  const na = new Vector3()
+  const nb = new Vector3()
+  const nc = new Vector3()
+  const nab = new Vector3()
+  const nbc = new Vector3()
+  const nca = new Vector3()
+  const uva = new Vector2()
+  const uvb = new Vector2()
+  const uvc = new Vector2()
+  const uvab = new Vector2()
+  const uvbc = new Vector2()
+  const uvca = new Vector2()
+
+  const pushVertex = (
+    positions: number[],
+    normals: number[] | undefined,
+    uvs: number[] | undefined,
+    vertex: Vector3,
+    normal?: Vector3,
+    uv?: Vector2,
+  ) => {
+    positions.push(vertex.x, vertex.y, vertex.z)
+    if (normals && normal) {
+      normals.push(normal.x, normal.y, normal.z)
+    }
+    if (uvs && uv) {
+      uvs.push(uv.x, uv.y)
+    }
+  }
+
+  for (let iteration = 0; iteration < levels; iteration += 1) {
+    const source = current.toNonIndexed()
+    const positionAttr = source.getAttribute('position') as BufferAttribute
+    const normalAttr = source.getAttribute('normal') as BufferAttribute | undefined
+    const uvAttr = source.getAttribute('uv') as BufferAttribute | undefined
+    const nextPositions: number[] = []
+    const nextNormals: number[] | undefined = normalAttr ? [] : undefined
+    const nextUVs: number[] | undefined = uvAttr ? [] : undefined
+    const vertexCount = positionAttr.count
+
+    for (let i = 0; i < vertexCount; i += 3) {
+      va.fromBufferAttribute(positionAttr, i)
+      vb.fromBufferAttribute(positionAttr, i + 1)
+      vc.fromBufferAttribute(positionAttr, i + 2)
+
+      vab.addVectors(va, vb).multiplyScalar(0.5)
+      vbc.addVectors(vb, vc).multiplyScalar(0.5)
+      vca.addVectors(vc, va).multiplyScalar(0.5)
+
+      if (normalAttr && nextNormals) {
+        na.fromBufferAttribute(normalAttr, i)
+        nb.fromBufferAttribute(normalAttr, i + 1)
+        nc.fromBufferAttribute(normalAttr, i + 2)
+
+        nab.addVectors(na, nb).normalize()
+        nbc.addVectors(nb, nc).normalize()
+        nca.addVectors(nc, na).normalize()
+      }
+
+      if (uvAttr && nextUVs) {
+        uva.fromBufferAttribute(uvAttr, i)
+        uvb.fromBufferAttribute(uvAttr, i + 1)
+        uvc.fromBufferAttribute(uvAttr, i + 2)
+
+        uvab.addVectors(uva, uvb).multiplyScalar(0.5)
+        uvbc.addVectors(uvb, uvc).multiplyScalar(0.5)
+        uvca.addVectors(uvc, uva).multiplyScalar(0.5)
+      }
+
+      const triangles: Array<{
+        v1: Vector3
+        v2: Vector3
+        v3: Vector3
+        n1?: Vector3
+        n2?: Vector3
+        n3?: Vector3
+        uv1?: Vector2
+        uv2?: Vector2
+        uv3?: Vector2
+      }> = [
+        { v1: va, v2: vab, v3: vca, n1: na, n2: nab, n3: nca, uv1: uva, uv2: uvab, uv3: uvca },
+        { v1: vab, v2: vb, v3: vbc, n1: nab, n2: nb, n3: nbc, uv1: uvab, uv2: uvb, uv3: uvbc },
+        { v1: vca, v2: vbc, v3: vc, n1: nca, n2: nbc, n3: nc, uv1: uvca, uv2: uvbc, uv3: uvc },
+        { v1: vab, v2: vbc, v3: vca, n1: nab, n2: nbc, n3: nca, uv1: uvab, uv2: uvbc, uv3: uvca },
+      ]
+
+      for (const tri of triangles) {
+        pushVertex(nextPositions, nextNormals, nextUVs, tri.v1, tri.n1, tri.uv1)
+        pushVertex(nextPositions, nextNormals, nextUVs, tri.v2, tri.n2, tri.uv2)
+        pushVertex(nextPositions, nextNormals, nextUVs, tri.v3, tri.n3, tri.uv3)
+      }
+    }
+
+    const subdivided = new BufferGeometry()
+    subdivided.setAttribute('position', new Float32BufferAttribute(nextPositions, 3))
+    if (nextNormals) {
+      subdivided.setAttribute('normal', new Float32BufferAttribute(nextNormals, 3))
+    }
+    if (nextUVs) {
+      subdivided.setAttribute('uv', new Float32BufferAttribute(nextUVs, 2))
+    }
+
+    current = subdivided
+  }
+
+  return current
 }
 
 const gatherGeometry = (group: Group) => {
@@ -125,8 +246,18 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
 
   const baseGeometry = useMemo(() => gatherGeometry(obj), [obj])
 
+  const sculptGeometry = useMemo(() => {
+    if (params.resolution <= 0) {
+      return baseGeometry
+    }
+    const subdivided = subdivideGeometry(baseGeometry.clone(), params.resolution)
+    const welded = weldGeometry(subdivided, WELD_TOLERANCE)
+    welded.computeVertexNormals()
+    return welded
+  }, [baseGeometry, params.resolution])
+
   const displacedGeometry = useMemo(() => {
-    const geometry = baseGeometry.clone()
+    const geometry = sculptGeometry.clone()
     const positions = geometry.getAttribute('position') as BufferAttribute
     const normals = geometry.getAttribute('normal') as BufferAttribute
     const displacements = new Float32Array(positions.count * 3)
@@ -182,7 +313,7 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     params.roughness,
     params.seed,
     params.warp,
-    baseGeometry,
+    sculptGeometry,
   ])
 
   const material = useMemo(

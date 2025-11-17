@@ -8,6 +8,7 @@ export interface NoiseParams {
   seed: number
   amplitude: number
   clamp: number
+  resolution: number
   frequency: number
   roughness: number
   warp: number
@@ -27,9 +28,10 @@ export interface SavedPreset {
 }
 
 type NumericParamKey = Exclude<keyof NoiseParams, 'noiseType'>
+type SliderParamKey = Exclude<NumericParamKey, 'resolution'>
 
 export interface SliderDefinition {
-  key: NumericParamKey
+  key: SliderParamKey
   label: string
   min: number
   max: number
@@ -46,6 +48,14 @@ export const sliderDefinitions: SliderDefinition[] = [
   { key: 'ridge', label: 'Ridge', min: 0, max: 1, step: 0.02, precision: 2 },
   { key: 'seed', label: 'Seed', min: 1, max: 9999, step: 1, precision: 0 },
 ]
+
+export const resolutionOptions = [0, 1, 2] as const
+const clampResolution = (value: number) => {
+  const min = resolutionOptions[0]
+  const max = resolutionOptions[resolutionOptions.length - 1]
+  const snapped = Math.round(value)
+  return Math.min(max, Math.max(min, snapped))
+}
 
 interface NoiseStoreState {
   params: NoiseParams
@@ -65,6 +75,7 @@ const defaultParams: NoiseParams = {
   seed: 1337,
   amplitude: 0,
   clamp: 0,
+  resolution: 0,
   frequency: 0,
   roughness: 0,
   warp: 0,
@@ -137,7 +148,12 @@ export const useNoiseStore = create<NoiseStoreState>((set) => ({
     set((state) => ({
       params: {
         ...state.params,
-        [key]: key === 'seed' ? Math.round(value) : value,
+        [key]:
+          key === 'seed'
+            ? Math.round(value)
+            : key === 'resolution'
+              ? clampResolution(value)
+              : value,
       },
     })),
   setNoiseType: (algorithm) =>
