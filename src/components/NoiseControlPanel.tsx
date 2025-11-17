@@ -33,11 +33,6 @@ export const NoiseControlPanel = () => {
 
   return (
     <aside className="control-panel">
-      <div className="panel-header">
-        <h1>ShoeShaper</h1>
-        <p>Cyberpunk noise lab — sculpt the base mesh with displacement fields.</p>
-      </div>
-
       <div className="panel-section">
         <label className="panel-label" htmlFor="mesh-resolution">
           RESOLUTION
