@@ -14,7 +14,7 @@ export const ShoeCanvas = () => {
 
   return (
     <section className="canvas-shell">
-      <Canvas shadows camera={{ position: [0, 0.8, 6], fov: 32 }}>
+      <Canvas shadows camera={{ position: [-48, 18, -48], fov: 35 }}>
         <color attach="background" args={['#030805']} />
         <hemisphereLight args={['#aaffcb', '#031107', 0.25]} />
         <directionalLight position={[5, 8, 5]} intensity={2} castShadow shadow-mapSize={[2048, 2048]} />
@@ -25,7 +25,7 @@ export const ShoeCanvas = () => {
           <FalloffHandle />
           <GroundGrid />
         </Suspense>
-        <OrbitControls autoRotate={toggles.autoRotate} enabled={!falloffDragging} />
+        <OrbitControls autoRotate={toggles.autoRotate} enabled={!falloffDragging} target={[0, 2, 0]} />
       </Canvas>
     </section>
   )
