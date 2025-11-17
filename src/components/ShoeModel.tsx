@@ -245,7 +245,15 @@ interface ShoeModelProps {
 export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
   const obj = useLoader(OBJLoader, '/models/BaseShoe.obj')
 
-  const baseGeometry = useMemo(() => gatherGeometry(obj), [obj])
+  const baseGeometry = useMemo(() => {
+    const geometry = gatherGeometry(obj)
+    geometry.computeBoundingBox()
+    const minY = geometry.boundingBox?.min.y ?? 0
+    const lift = FLOOR_Y + FLOOR_CLEARANCE - minY
+    geometry.translate(0, lift, 0)
+    geometry.computeBoundingBox()
+    return geometry
+  }, [obj])
 
   const sculptGeometry = useMemo(() => {
     if (params.resolution <= 0) {
@@ -312,14 +320,6 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     positions.needsUpdate = true
     geometry.computeVertexNormals()
 
-    geometry.computeBoundingBox()
-    const minY = geometry.boundingBox?.min.y ?? 0
-    const lift = FLOOR_Y + FLOOR_CLEARANCE - minY
-    if (lift > 0) {
-      geometry.translate(0, lift, 0)
-      geometry.computeBoundingBox()
-    }
-
     return weldGeometry(geometry)
   }, [
     params.amplitude,
@@ -356,7 +356,7 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
   )
 
   return (
-    <group position={[0, -1.2, 0]}>
+    <group position={[0, 2, 0]}>
       <mesh geometry={displacedGeometry} material={material} castShadow receiveShadow />
     </group>
   )
