@@ -6,7 +6,7 @@ import { FLOOR_Y } from '../constants/environment'
 
 const HANDLE_Y = FLOOR_Y + 0.05
 const RING_Y = FLOOR_Y + 0.001
-const HANDLE_RADIUS = 0.12
+const HANDLE_RADIUS = 0.24
 
 export const FalloffHandle = () => {
   const falloffCenterX = useNoiseStore((state) => state.params.falloffCenterX)
@@ -104,11 +104,7 @@ export const FalloffHandle = () => {
         <sphereGeometry args={[HANDLE_RADIUS, 32, 32]} />
         <meshStandardMaterial color="#ff1a1a" emissive="#ff0000" emissiveIntensity={0.75} />
       </mesh>
-      <mesh
-        position={[falloffCenterX, HANDLE_Y, falloffCenterZ]}
-        scale={1.5}
-        raycast={() => null}
-      >
+      <mesh position={[falloffCenterX, HANDLE_Y, falloffCenterZ]} scale={1.5} raycast={() => null}>
         <sphereGeometry args={[HANDLE_RADIUS, 32, 32]} />
         <meshBasicMaterial
           color="#ff3b3b"

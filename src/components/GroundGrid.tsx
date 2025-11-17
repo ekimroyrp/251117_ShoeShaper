@@ -10,8 +10,8 @@ export const GroundGrid = () => (
     sectionThickness={1.2}
     cellSize={1}
     cellThickness={0.6}
-    cellColor="#cfd4d8"
-    sectionColor="#dfe5eb"
+    cellColor="#8b9095"
+    sectionColor="#5e6368"
     fadeDistance={140}
     fadeStrength={1.2}
     infiniteGrid
