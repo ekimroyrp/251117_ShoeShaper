@@ -1,5 +1,6 @@
-import { useMemo, useRef } from 'react'
+﻿import { useMemo, useRef } from 'react'
 import type { ThreeEvent } from '@react-three/fiber'
+import { Billboard, Text } from '@react-three/drei'
 import { AdditiveBlending, Plane, Vector3 } from 'three'
 import { useNoiseStore } from '../state/useNoiseStore'
 import { FLOOR_Y } from '../constants/environment'
@@ -7,6 +8,7 @@ import { FLOOR_Y } from '../constants/environment'
 const HANDLE_Y = FLOOR_Y + 0.05
 const RING_Y = FLOOR_Y + 0.001
 const HANDLE_RADIUS = 0.24
+const LABEL_OFFSET = 0.6
 
 export const FalloffHandle = () => {
   const falloffCenterX = useNoiseStore((state) => state.params.falloffCenterX)
@@ -114,6 +116,19 @@ export const FalloffHandle = () => {
           blending={AdditiveBlending}
         />
       </mesh>
+      <Billboard position={[falloffCenterX, HANDLE_Y + LABEL_OFFSET, falloffCenterZ]} follow>
+        <Text
+          font="/fonts/ShareTechMono-Regular.ttf"
+          fontSize={0.4}
+          color="#ff3b3b"
+          anchorX="center"
+          anchorY="bottom"
+          outlineWidth={0.01}
+          outlineColor="#000000"
+        >
+          FALLOFF POINT
+        </Text>
+      </Billboard>
     </group>
   )
 }

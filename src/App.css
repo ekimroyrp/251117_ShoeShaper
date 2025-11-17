@@ -84,10 +84,11 @@
 }
 
 .select-shell {
-  border: 1px solid #20a763;
+  border: none;
   border-radius: 4px;
-  background: rgba(18, 56, 36, 0.7);
-  box-shadow: 0 0 12px rgba(37, 255, 140, 0.2);
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
 }
 
 .panel-grid {
@@ -173,19 +174,26 @@
 select {
   width: 100%;
   padding: 0.55rem;
-  background: transparent;
-  border: none;
-  color: #d7ffe8;
+  appearance: none;
+  -webkit-appearance: none;
+  background: linear-gradient(180deg, rgba(6, 42, 26, 0.95) 0%, rgba(4, 30, 19, 0.95) 100%);
+  border: 1px solid rgba(31, 255, 138, 0.85);
+  border-radius: 6px;
+  color: #65ffb7;
   font-family: inherit;
   font-size: 0.95rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  box-shadow: 0 0 14px rgba(24, 255, 145, 0.3), inset 0 0 12px rgba(0, 0, 0, 0.5);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 select:focus {
   outline: none;
+  background-color: rgba(0, 0, 0, 0.98);
+  border-color: rgba(95, 255, 186, 0.95);
+  box-shadow: 0 0 22px rgba(94, 255, 186, 0.5), inset 0 0 16px rgba(0, 0, 0, 0.5);
 }
-
 button {
   background: #0c2f1c;
   color: #65ffb7;
@@ -217,4 +225,9 @@ button:hover {
     border-top: 2px solid #0f5a35;
     overflow-y: visible;
   }
+}
+
+option {
+  background: #000000;
+  color: #65ffb7;
 }

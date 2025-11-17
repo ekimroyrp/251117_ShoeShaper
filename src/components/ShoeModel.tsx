@@ -15,7 +15,7 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { createNoise3D, type NoiseFunction3D } from 'simplex-noise'
 import seedrandom from 'seedrandom'
-import type { NoiseParams, NoiseToggles } from '../state/useNoiseStore'
+import type { NoiseAlgorithm, NoiseParams, NoiseToggles } from '../state/useNoiseStore'
 import { FLOOR_CLEARANCE, FLOOR_Y } from '../constants/environment'
 
 const WELD_TOLERANCE = 1e-4
@@ -195,15 +195,27 @@ const gatherGeometry = (group: Group) => {
 const createNoiseGenerator = (seed: number): NoiseFunction3D =>
   createNoise3D(seedrandom(String(seed)))
 
-const sampleNoise = (
+const hashFloat = (x: number, y: number, z: number, seed: number) => {
+  const s = Math.sin(x * 12.9898 + y * 78.233 + z * 37.719 + seed * 95.233)
+  return (s - Math.floor(s)) || 0
+}
+
+const hashVec3 = (x: number, y: number, z: number, seed: number) =>
+  new Vector3(
+    hashFloat(x, y, z, seed),
+    hashFloat(x + 19.19, y - 55.5, z + 3.3, seed + 1),
+    hashFloat(x - 11.7, y + 8.33, z - 4.52, seed + 2),
+  )
+
+const layeredSimplex = (
   simplex: NoiseFunction3D,
-  type: string,
+  mode: 'simplex' | 'ridge' | 'warped',
   point: Vector3,
-  params: { frequency: number; roughness: number; warp: number; ridge: number },
+  params: NoiseParams,
 ) => {
   const layers = 3
   let amplitude = 1
-  let frequency = params.frequency
+  let frequency = Math.max(0.0001, params.frequency)
   let value = 0
   const warpedPoint = point.clone()
 
@@ -222,10 +234,10 @@ const sampleNoise = (
       warpedPoint.y * frequency,
       warpedPoint.z * frequency,
     )
-    if (type === 'ridge') {
+    if (mode === 'ridge') {
       const ridge = 1 - Math.abs(noiseSample)
       value += Math.pow(ridge, 1.2 + params.ridge) * amplitude
-    } else if (type === 'warped') {
+    } else if (mode === 'warped') {
       value += Math.sin(noiseSample * Math.PI) * amplitude
     } else {
       value += noiseSample * amplitude
@@ -235,6 +247,108 @@ const sampleNoise = (
   }
 
   return value
+}
+
+const worleyNoise = (point: Vector3, params: NoiseParams, seed: number) => {
+  const freq = Math.max(0.0001, params.frequency)
+  const jitter = Math.max(0, Math.min(1, params.worleyJitter))
+  const blend = Math.max(0, Math.min(1, params.worleyBlend))
+  const scaled = point.clone().multiplyScalar(freq)
+  const base = new Vector3(Math.floor(scaled.x), Math.floor(scaled.y), Math.floor(scaled.z))
+
+  let min1 = Infinity
+  let min2 = Infinity
+
+  for (let dx = -1; dx <= 1; dx += 1) {
+    for (let dy = -1; dy <= 1; dy += 1) {
+      for (let dz = -1; dz <= 1; dz += 1) {
+        const cell = new Vector3(base.x + dx, base.y + dy, base.z + dz)
+        const jitterOffset = hashVec3(cell.x, cell.y, cell.z, seed).subScalar(0.5).multiplyScalar(jitter).addScalar(0.5)
+        const featurePoint = new Vector3(cell.x + jitterOffset.x, cell.y + jitterOffset.y, cell.z + jitterOffset.z)
+        const diff = featurePoint.sub(scaled)
+        const distance = diff.length()
+        if (distance < min1) {
+          min2 = min1
+          min1 = distance
+        } else if (distance < min2) {
+          min2 = distance
+        }
+      }
+    }
+  }
+
+  const cellValue = Math.max(0, 1 - min1)
+  const edgeValue = Math.max(0, Math.min(1, min2 - min1))
+  const mixValue = cellValue * (1 - blend) + edgeValue * blend
+  return mixValue * 2 - 1
+}
+
+const curlNoise = (
+  simplex: NoiseFunction3D,
+  point: Vector3,
+  normal: Vector3,
+  params: NoiseParams,
+) => {
+  const scale = Math.max(0.0001, params.frequency * params.curlScale)
+  const p = point.clone().multiplyScalar(scale)
+  const eps = 0.01
+
+  const noiseVec = (v: Vector3) =>
+    new Vector3(
+      simplex(v.x, v.y, v.z),
+      simplex(v.y + 31.34, v.z + 78.23, v.x + 12.34),
+      simplex(v.z + 45.32, v.x + 5.73, v.y + 63.94),
+    )
+
+  const v1 = noiseVec(new Vector3(p.x, p.y + eps, p.z))
+  const v2 = noiseVec(new Vector3(p.x, p.y - eps, p.z))
+  const v3 = noiseVec(new Vector3(p.x, p.y, p.z + eps))
+  const v4 = noiseVec(new Vector3(p.x, p.y, p.z - eps))
+  const v5 = noiseVec(new Vector3(p.x + eps, p.y, p.z))
+  const v6 = noiseVec(new Vector3(p.x - eps, p.y, p.z))
+
+  const curl = new Vector3(
+    (v3.y - v4.y - (v1.z - v2.z)) / (2 * eps),
+    (v5.z - v6.z - (v3.x - v4.x)) / (2 * eps),
+    (v1.x - v2.x - (v5.y - v6.y)) / (2 * eps),
+  )
+
+  return curl.dot(normal) * params.curlStrength
+}
+
+const alligatorNoise = (simplex: NoiseFunction3D, point: Vector3, params: NoiseParams) => {
+  const freq = Math.max(0.0001, params.frequency)
+  const scaled = point.clone().multiplyScalar(freq)
+  const base = simplex(scaled.x, scaled.y, scaled.z)
+  const ridge = Math.pow(1 - Math.abs(base), 1.2 + params.alligatorPlateau * 2)
+  const bite = Math.max(0.1, params.alligatorBite)
+  const stripes = Math.sin((scaled.x + scaled.y + scaled.z) * (0.5 + bite)) * 0.5 + 0.5
+  const mix = stripes * (1 - params.alligatorPlateau) + ridge * params.alligatorPlateau
+  return mix * 2 - 1
+}
+
+const sampleNoise = (
+  simplex: NoiseFunction3D,
+  type: NoiseAlgorithm,
+  point: Vector3,
+  normal: Vector3,
+  params: NoiseParams,
+) => {
+  switch (type) {
+    case 'ridge':
+      return layeredSimplex(simplex, 'ridge', point, params)
+    case 'warped':
+      return layeredSimplex(simplex, 'warped', point, params)
+    case 'worley':
+      return worleyNoise(point, params, params.seed)
+    case 'curl':
+      return curlNoise(simplex, point, normal, params)
+    case 'alligator':
+      return alligatorNoise(simplex, point, params)
+    case 'simplex':
+    default:
+      return layeredSimplex(simplex, 'simplex', point, params)
+  }
 }
 
 interface ShoeModelProps {
@@ -292,8 +406,8 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
 
     for (let i = 0; i < positions.count; i += 1) {
       position.set(positions.getX(i), positions.getY(i), positions.getZ(i))
-      const sample = sampleNoise(simplex, params.noiseType, position, params)
       normal.set(normals.getX(i), normals.getY(i), normals.getZ(i)).normalize()
+      const sample = sampleNoise(simplex, params.noiseType, position, normal, params)
       const normalizedDistance =
         invMaxDistance === 0 ? 0 : Math.min(1, falloffDistances[i] * invMaxDistance)
       const falloffWeight = Math.pow(normalizedDistance, falloffExponent)

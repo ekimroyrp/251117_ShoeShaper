@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-export const noiseAlgorithms = ['simplex', 'ridge', 'warped'] as const
+export const noiseAlgorithms = ['simplex', 'ridge', 'warped', 'worley', 'curl', 'alligator'] as const
 
 export type NoiseAlgorithm = (typeof noiseAlgorithms)[number]
 
@@ -16,6 +16,12 @@ export interface NoiseParams {
   roughness: number
   warp: number
   ridge: number
+  worleyJitter: number
+  worleyBlend: number
+  curlStrength: number
+  curlScale: number
+  alligatorBite: number
+  alligatorPlateau: number
   noiseType: NoiseAlgorithm
 }
 
@@ -31,10 +37,9 @@ export interface SavedPreset {
 }
 
 type NumericParamKey = Exclude<keyof NoiseParams, 'noiseType'>
-type SliderParamKey = Exclude<NumericParamKey, 'resolution' | 'falloffCenterX' | 'falloffCenterZ'>
+export type SliderParamKey = Exclude<NumericParamKey, 'resolution' | 'falloffCenterX' | 'falloffCenterZ'>
 
 export interface SliderDefinition {
-  key: SliderParamKey
   label: string
   min: number
   max: number
@@ -42,16 +47,50 @@ export interface SliderDefinition {
   precision?: number
 }
 
-export const sliderDefinitions: SliderDefinition[] = [
-  { key: 'amplitude', label: 'Displacement', min: 0, max: 6, step: 0.05, precision: 2 },
-  { key: 'falloff', label: 'FALLOFF', min: 0, max: 10, step: 0.05, precision: 2 },
-  { key: 'clamp', label: 'CLAMP', min: 0, max: 6, step: 0.05, precision: 2 },
-  { key: 'frequency', label: 'Frequency', min: 0, max: 4, step: 0.05, precision: 2 },
-  { key: 'roughness', label: 'Roughness', min: 0, max: 1.6, step: 0.05, precision: 2 },
-  { key: 'warp', label: 'Warp', min: 0, max: 2.5, step: 0.05, precision: 2 },
-  { key: 'ridge', label: 'Ridge', min: 0, max: 1, step: 0.02, precision: 2 },
-  { key: 'seed', label: 'Seed', min: 1, max: 9999, step: 1, precision: 0 },
+export const sliderDefinitions: Record<SliderParamKey, SliderDefinition> = {
+  amplitude: { label: 'Displacement', min: 0, max: 6, step: 0.05, precision: 2 },
+  falloff: { label: 'FALLOFF', min: 0, max: 10, step: 0.05, precision: 2 },
+  clamp: { label: 'CLAMP', min: 0, max: 6, step: 0.05, precision: 2 },
+  frequency: { label: 'Frequency', min: 0, max: 4, step: 0.05, precision: 3 },
+  roughness: { label: 'Roughness', min: 0, max: 1.6, step: 0.05, precision: 2 },
+  warp: { label: 'Warp', min: 0, max: 2.5, step: 0.05, precision: 2 },
+  ridge: { label: 'Ridge', min: 0, max: 1, step: 0.02, precision: 2 },
+  seed: { label: 'Seed', min: 1, max: 9999, step: 1, precision: 0 },
+  worleyJitter: { label: 'Cell Jitter', min: 0, max: 1, step: 0.01, precision: 2 },
+  worleyBlend: { label: 'Edge Blend', min: 0, max: 1, step: 0.01, precision: 2 },
+  curlStrength: { label: 'Curl Strength', min: 0, max: 4, step: 0.05, precision: 2 },
+  curlScale: { label: 'Curl Detail', min: 0.1, max: 3, step: 0.05, precision: 2 },
+  alligatorBite: { label: 'Bite', min: 0, max: 3, step: 0.05, precision: 2 },
+  alligatorPlateau: { label: 'Plateau', min: 0, max: 1, step: 0.02, precision: 2 },
+}
+
+export const sliderOrder: SliderParamKey[] = [
+  'amplitude',
+  'falloff',
+  'clamp',
+  'frequency',
+  'roughness',
+  'warp',
+  'ridge',
+  'worleyJitter',
+  'worleyBlend',
+  'curlStrength',
+  'curlScale',
+  'alligatorBite',
+  'alligatorPlateau',
+  'seed',
 ]
+
+export const baseSliderKeys: SliderParamKey[] = ['amplitude', 'falloff', 'clamp', 'frequency', 'seed']
+
+export const algorithmSliderMap: Record<NoiseAlgorithm, SliderParamKey[]> = {
+  simplex: ['roughness', 'warp'],
+  ridge: ['roughness', 'ridge'],
+  warped: ['roughness', 'warp'],
+  worley: ['worleyJitter', 'worleyBlend'],
+  curl: ['curlScale', 'curlStrength'],
+  alligator: ['alligatorBite', 'alligatorPlateau'],
+}
 
 export const resolutionOptions = [0, 1, 2] as const
 const clampResolution = (value: number) => {
@@ -90,6 +129,12 @@ const defaultParams: NoiseParams = {
   roughness: 0.15,
   warp: 0.25,
   ridge: 0.3,
+  worleyJitter: 0.75,
+  worleyBlend: 0.4,
+  curlStrength: 1.2,
+  curlScale: 1,
+  alligatorBite: 0.8,
+  alligatorPlateau: 0.4,
   noiseType: 'simplex',
 }
 

@@ -1,9 +1,13 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { CyberSlider } from './CyberSlider'
 import {
+  algorithmSliderMap,
+  baseSliderKeys,
   noiseAlgorithms,
   resolutionOptions,
   sliderDefinitions,
+  sliderOrder,
+  type SliderParamKey,
   useNoiseStore,
 } from '../state/useNoiseStore'
 
@@ -22,6 +26,15 @@ export const NoiseControlPanel = () => {
     deletePreset,
   } = useNoiseStore()
   const [presetName, setPresetName] = useState('')
+
+  const sliderKeySet = useMemo(
+    () => new Set<SliderParamKey>([...baseSliderKeys, ...(algorithmSliderMap[params.noiseType] ?? [])]),
+    [params.noiseType],
+  )
+  const orderedSliderKeys = useMemo(
+    () => sliderOrder.filter((key) => sliderKeySet.has(key)),
+    [sliderKeySet],
+  )
 
   const handleSavePreset = () => {
     if (!presetName.trim()) {
@@ -72,14 +85,17 @@ export const NoiseControlPanel = () => {
       </div>
 
       <div className="panel-grid">
-        {sliderDefinitions.map(({ key, ...slider }) => (
-          <CyberSlider
-            key={key}
-            {...slider}
-            value={params[key]}
-            onChange={(value) => setParam(key, value)}
-          />
-        ))}
+        {orderedSliderKeys.map((key) => {
+          const slider = sliderDefinitions[key]
+          return (
+            <CyberSlider
+              key={key}
+              {...slider}
+              value={params[key]}
+              onChange={(value) => setParam(key, value)}
+            />
+          )
+        })}
       </div>
 
       <div className="panel-section">
