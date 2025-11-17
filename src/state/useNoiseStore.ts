@@ -79,17 +79,17 @@ interface NoiseStoreState {
 }
 
 const defaultParams: NoiseParams = {
-  seed: 1337,
-  amplitude: 0,
-  clamp: 0,
-  resolution: 0,
-  falloff: 0,
+  seed: 4683,
+  amplitude: 3.3,
+  clamp: 0.6,
+  resolution: 1,
+  falloff: 1.75,
   falloffCenterX: 0,
   falloffCenterZ: -16,
-  frequency: 0,
-  roughness: 0,
-  warp: 0,
-  ridge: 0,
+  frequency: 0.35,
+  roughness: 0.15,
+  warp: 0.25,
+  ridge: 0.3,
   noiseType: 'simplex',
 }
 
