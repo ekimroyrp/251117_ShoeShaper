@@ -1,0 +1,145 @@
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  color: #dbffe6;
+  background: radial-gradient(circle at top, #042113 0%, #020c07 45%, #010402 100%);
+  font-family: 'Share Tech Mono', 'Space Mono', 'Courier New', monospace;
+}
+
+.canvas-shell {
+  flex: 1 1 auto;
+  position: relative;
+  min-height: 100vh;
+  box-shadow: inset 0 0 60px rgba(16, 255, 150, 0.14);
+}
+
+.canvas-shell canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.canvas-loader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #35ff8d;
+  background: rgba(3, 10, 7, 0.82);
+  font-size: 0.8rem;
+}
+
+.canvas-stats {
+  left: auto !important;
+  right: 1rem !important;
+  top: 1rem !important;
+}
+
+.control-panel {
+  width: 360px;
+  padding: 1.5rem;
+  border-left: 2px solid #0f5a35;
+  background: linear-gradient(180deg, rgba(4, 32, 16, 0.95) 0%, rgba(1, 12, 6, 0.98) 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.panel-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #56ff9a;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.panel-header p {
+  margin: 0.3rem 0 0;
+  font-size: 0.8rem;
+  color: #a4ffd3;
+}
+
+.panel-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.panel-label {
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6fffaf;
+}
+
+.select-shell {
+  border: 1px solid #20a763;
+  border-radius: 4px;
+  background: rgba(18, 56, 36, 0.7);
+  box-shadow: 0 0 12px rgba(37, 255, 140, 0.2);
+}
+
+.panel-grid {
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.toggle-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+select {
+  width: 100%;
+  padding: 0.55rem;
+  background: transparent;
+  border: none;
+  color: #d7ffe8;
+  font-family: inherit;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+select:focus {
+  outline: none;
+}
+
+button {
+  background: #0c2f1c;
+  color: #65ffb7;
+  border: 1px solid #1fff8a;
+  padding: 0.65rem 0.8rem;
+  font-family: inherit;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 0 14px rgba(24, 255, 145, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 18px rgba(47, 255, 128, 0.45);
+}
+
+@media (max-width: 960px) {
+  .app-shell {
+    flex-direction: column;
+  }
+
+  .control-panel {
+    width: 100%;
+    border-left: none;
+    border-top: 2px solid #0f5a35;
+  }
+}
