@@ -4,10 +4,10 @@
 
 ## Features
 - Vite + TypeScript scaffold with React 19, @react-three/fiber, @react-three/drei, and Zustand for fast iteration.
-- BaseShoe.obj is bundled inside `public/models` and displaced directly on the CPU with seeded simplex noise (no rebuild step required).
+- BaseShoe.obj is bundled inside `public/models`, remeshed with `SimplifyModifier`, and displaced on the CPU with seeded simplex noise.
 - Cyberpunk control deck cloned from the reference project, including neon sliders, dropdowns, and toggle actions.
 - Local preset manager persists custom slider stacks in `localStorage`, so you can recall favorite noise fields instantly.
-- Parameter store tracks amplitude, frequency, warp, ridge strength, wireframe, and autorotation so UI + scene stay in sync.
+- Parameter store tracks amplitude, frequency, warp, ridge strength, remesh density, wireframe, and autorotation so UI + scene stay in sync.
 - Canvas scene ships with HDR environment, dual key lights, stats overlay, a domain-warped noise shader, and runtime-safe OBJ loading with error surfaces.
 
 ## Getting Started
@@ -18,7 +18,7 @@
 
 ## Controls
 - **Noise Mode** dropdown switches between simplex, ridge, and warped layering styles.
-- **Sliders:** Displacement (amplitude), Frequency, Roughness (octave falloff), Warp (domain warp), Ridge sharpening, and Seed all map directly to the modifier pipeline.
+- **Sliders:** Displacement (amplitude), Frequency, Roughness (octave falloff), Warp (domain warp), Ridge sharpening, Remesh Density, and Seed all map directly to the modifier pipeline.
 - **Wireframe / Auto Orbit** toggle buttons let you inspect geometry or pause the hero camera sweep.
 - **Presets** panel saves/loading/deletes custom sliders, persisted locally for quick recall.
 - **Pulse Seed** creates a new pseudo-random seed while keeping the rest of the stack untouched.

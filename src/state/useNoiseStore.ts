@@ -11,6 +11,7 @@ export interface NoiseParams {
   roughness: number
   warp: number
   ridge: number
+  remeshRatio: number
   noiseType: NoiseAlgorithm
 }
 
@@ -42,6 +43,7 @@ export const sliderDefinitions: SliderDefinition[] = [
   { key: 'roughness', label: 'Roughness', min: 0.2, max: 1.6, step: 0.05, precision: 2 },
   { key: 'warp', label: 'Warp', min: 0, max: 2.5, step: 0.05, precision: 2 },
   { key: 'ridge', label: 'Ridge', min: 0, max: 1, step: 0.02, precision: 2 },
+  { key: 'remeshRatio', label: 'Remesh Density', min: 0.25, max: 1, step: 0.01, precision: 2 },
   { key: 'seed', label: 'Seed', min: 1, max: 9999, step: 1, precision: 0 },
 ]
 
@@ -66,6 +68,7 @@ const defaultParams: NoiseParams = {
   roughness: 0.8,
   warp: 0.4,
   ridge: 0.25,
+  remeshRatio: 0.65,
   noiseType: 'simplex',
 }
 

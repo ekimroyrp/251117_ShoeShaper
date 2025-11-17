@@ -4,51 +4,19 @@ import {
   BufferAttribute,
   BufferGeometry,
   Color,
-  Float32BufferAttribute,
   Group,
   Mesh,
   MeshStandardMaterial,
   Vector3,
 } from 'three'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
+import { SimplifyModifier } from 'three/examples/jsm/modifiers/SimplifyModifier.js'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { createNoise3D, type NoiseFunction3D } from 'simplex-noise'
 import seedrandom from 'seedrandom'
 import type { NoiseParams, NoiseToggles } from '../state/useNoiseStore'
 
-const WELD_TOLERANCE = 1e-4
-
-const weldGeometry = (geometry: BufferGeometry, tolerance = WELD_TOLERANCE) => {
-  const position = geometry.getAttribute('position') as BufferAttribute
-  const sourceIndex = geometry.index ? geometry.index.array : undefined
-  const keyFactor = 1 / tolerance
-  const positionMap = new Map<string, number>()
-  const nextPosition: number[] = []
-  const nextIndices: number[] = []
-
-  const getVertexIndex = (i: number) => (sourceIndex ? sourceIndex[i] : i)
-
-  for (let faceIndex = 0; faceIndex < (sourceIndex ? sourceIndex.length : position.count); faceIndex += 1) {
-    const idx = getVertexIndex(faceIndex)
-    const x = position.getX(idx)
-    const y = position.getY(idx)
-    const z = position.getZ(idx)
-    const key = `${Math.round(x * keyFactor)}_${Math.round(y * keyFactor)}_${Math.round(z * keyFactor)}`
-    let mapped = positionMap.get(key)
-    if (mapped === undefined) {
-      mapped = nextPosition.length / 3
-      positionMap.set(key, mapped)
-      nextPosition.push(x, y, z)
-    }
-    nextIndices.push(mapped)
-  }
-
-  const result = new BufferGeometry()
-  result.setAttribute('position', new Float32BufferAttribute(nextPosition, 3))
-  result.setIndex(nextIndices)
-  result.computeVertexNormals()
-  return result
-}
+const simplifyModifier = new SimplifyModifier()
 
 const gatherGeometry = (group: Group) => {
   const geometries: BufferGeometry[] = []
@@ -56,7 +24,6 @@ const gatherGeometry = (group: Group) => {
     if ((child as Mesh).isMesh) {
       const mesh = child as Mesh
       const cloned = mesh.geometry.clone()
-      cloned.applyMatrix4(mesh.matrixWorld)
       geometries.push(cloned)
     }
   })
@@ -65,9 +32,23 @@ const gatherGeometry = (group: Group) => {
     throw new Error('No geometry found in BaseShoe.obj')
   }
 
-  const merged = mergeGeometries(geometries, true)
+  const merged = mergeGeometries(geometries, false)
   merged.center()
-  return weldGeometry(merged)
+  merged.computeVertexNormals()
+  return merged
+}
+
+const applyRemesh = (geometry: BufferGeometry, ratio: number) => {
+  const remeshed = geometry.clone()
+  const originalCount = geometry.attributes.position.count
+  const targetCount = Math.max(1500, Math.floor(originalCount * ratio))
+
+  if (targetCount < originalCount) {
+    simplifyModifier.modify(remeshed, targetCount)
+  }
+
+  remeshed.computeVertexNormals()
+  return remeshed
 }
 
 const createNoiseGenerator = (seed: number): NoiseFunction3D =>
@@ -125,31 +106,26 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
 
   const baseGeometry = useMemo(() => gatherGeometry(obj), [obj])
 
+  const remeshedGeometry = useMemo(
+    () => applyRemesh(baseGeometry, params.remeshRatio),
+    [baseGeometry, params.remeshRatio],
+  )
+
   const displacedGeometry = useMemo(() => {
-    const geometry = baseGeometry.clone()
+    const geometry = remeshedGeometry.clone()
     const positions = geometry.getAttribute('position') as BufferAttribute
     const normals = geometry.getAttribute('normal') as BufferAttribute
-    const displacements = new Float32Array(positions.count * 3)
     const simplex = createNoiseGenerator(params.seed)
-    const normal = new Vector3()
-    const position = new Vector3()
+    const workingNormal = new Vector3()
+    const samplePoint = new Vector3()
 
     for (let i = 0; i < positions.count; i += 1) {
-      position.set(positions.getX(i), positions.getY(i), positions.getZ(i))
-      const sample = sampleNoise(simplex, params.noiseType, position, params)
-      normal.set(normals.getX(i), normals.getY(i), normals.getZ(i)).normalize()
+      samplePoint.set(positions.getX(i), positions.getY(i), positions.getZ(i))
+      const sample = sampleNoise(simplex, params.noiseType, samplePoint, params)
+      workingNormal.set(normals.getX(i), normals.getY(i), normals.getZ(i))
       const offset = sample * params.amplitude
-      displacements[i * 3] = normal.x * offset
-      displacements[i * 3 + 1] = normal.y * offset
-      displacements[i * 3 + 2] = normal.z * offset
-    }
-
-    for (let i = 0; i < positions.count; i += 1) {
-      position.set(positions.getX(i), positions.getY(i), positions.getZ(i))
-      position.x += displacements[i * 3]
-      position.y += displacements[i * 3 + 1]
-      position.z += displacements[i * 3 + 2]
-      positions.setXYZ(i, position.x, position.y, position.z)
+      samplePoint.addScaledVector(workingNormal, offset)
+      positions.setXYZ(i, samplePoint.x, samplePoint.y, samplePoint.z)
     }
 
     positions.needsUpdate = true
@@ -165,16 +141,17 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
       geometry.computeBoundingBox()
     }
 
-    return weldGeometry(geometry)
+    return geometry
   }, [
+    remeshedGeometry,
     params.amplitude,
     params.frequency,
     params.noiseType,
+    params.remeshRatio,
     params.ridge,
     params.roughness,
     params.seed,
     params.warp,
-    baseGeometry,
   ])
 
   const material = useMemo(
