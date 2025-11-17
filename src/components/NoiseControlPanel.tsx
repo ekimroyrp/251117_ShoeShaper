@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { CyberSlider } from './CyberSlider'
 import {
   noiseAlgorithms,
@@ -6,8 +7,28 @@ import {
 } from '../state/useNoiseStore'
 
 export const NoiseControlPanel = () => {
-  const { params, toggles, setParam, setNoiseType, randomizeSeed, resetParams, toggleFlag } =
-    useNoiseStore()
+  const {
+    params,
+    toggles,
+    presets,
+    setParam,
+    setNoiseType,
+    randomizeSeed,
+    resetParams,
+    toggleFlag,
+    savePreset,
+    loadPreset,
+    deletePreset,
+  } = useNoiseStore()
+  const [presetName, setPresetName] = useState('')
+
+  const handleSavePreset = () => {
+    if (!presetName.trim()) {
+      return
+    }
+    savePreset(presetName)
+    setPresetName('')
+  }
 
   return (
     <aside className="control-panel">
@@ -44,6 +65,47 @@ export const NoiseControlPanel = () => {
             onChange={(value) => setParam(key, value)}
           />
         ))}
+      </div>
+
+      <div className="panel-section">
+        <label className="panel-label" htmlFor="preset-name">
+          Save Preset
+        </label>
+        <div className="preset-save">
+          <input
+            id="preset-name"
+            className="preset-input"
+            placeholder="Enter preset name"
+            value={presetName}
+            onChange={(event) => setPresetName(event.target.value)}
+          />
+          <button type="button" onClick={handleSavePreset}>
+            Save
+          </button>
+        </div>
+        <div className="preset-list">
+          {presets.length === 0 ? (
+            <p className="preset-list__empty">No saved presets yet.</p>
+          ) : (
+            presets.map((preset) => (
+              <div key={preset.id} className="preset-list__item">
+                <span>{preset.name}</span>
+                <div className="preset-list__actions">
+                  <button type="button" onClick={() => loadPreset(preset.id)}>
+                    Load
+                  </button>
+                  <button
+                    type="button"
+                    className="preset-list__delete"
+                    onClick={() => deletePreset(preset.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
 
       <div className="panel-section toggle-grid">

@@ -14,7 +14,7 @@ import { SimplifyModifier } from 'three/examples/jsm/modifiers/SimplifyModifier.
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { createNoise3D, type NoiseFunction3D } from 'simplex-noise'
 import seedrandom from 'seedrandom'
-import { useNoiseStore } from '../state/useNoiseStore'
+import type { NoiseParams, NoiseToggles } from '../state/useNoiseStore'
 
 const simplifyModifier = new SimplifyModifier()
 
@@ -96,12 +96,13 @@ const sampleNoise = (
   return value
 }
 
-export const ShoeModel = () => {
+interface ShoeModelProps {
+  params: NoiseParams
+  toggles: NoiseToggles
+}
+
+export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
   const obj = useLoader(OBJLoader, '/models/BaseShoe.obj')
-  const { params, toggles } = useNoiseStore((state) => ({
-    params: state.params,
-    toggles: state.toggles,
-  }))
 
   const baseGeometry = useMemo(() => gatherGeometry(obj), [obj])
 

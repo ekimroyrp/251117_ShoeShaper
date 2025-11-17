@@ -20,6 +20,12 @@ export interface NoiseToggles {
   wireframe: boolean
 }
 
+export interface SavedPreset {
+  id: string
+  name: string
+  params: NoiseParams
+}
+
 type NumericParamKey = Exclude<keyof NoiseParams, 'noiseType'>
 
 export interface SliderDefinition {
@@ -44,11 +50,15 @@ export const sliderDefinitions: SliderDefinition[] = [
 interface NoiseStoreState {
   params: NoiseParams
   toggles: NoiseToggles
+  presets: SavedPreset[]
   setParam: (key: NumericParamKey, value: number) => void
   setNoiseType: (algorithm: NoiseAlgorithm) => void
   randomizeSeed: () => void
   resetParams: () => void
   toggleFlag: (flag: keyof NoiseToggles) => void
+  savePreset: (name: string) => void
+  loadPreset: (id: string) => void
+  deletePreset: (id: string) => void
 }
 
 const defaultParams: NoiseParams = {
@@ -67,9 +77,59 @@ const defaultToggles: NoiseToggles = {
   wireframe: false,
 }
 
+const storageKey = 'shoeshaper-presets'
+
+const cloneParams = (params: NoiseParams): NoiseParams => ({ ...params })
+const cloneToggles = (toggles: NoiseToggles): NoiseToggles => ({ ...toggles })
+
+const readPresets = (): SavedPreset[] => {
+  if (typeof window === 'undefined') {
+    return []
+  }
+
+  try {
+    const raw = window.localStorage.getItem(storageKey)
+    if (!raw) {
+      return []
+    }
+    const parsed = JSON.parse(raw) as SavedPreset[]
+    if (!Array.isArray(parsed)) {
+      return []
+    }
+    return parsed.filter(
+      (preset): preset is SavedPreset =>
+        typeof preset?.id === 'string' &&
+        typeof preset?.name === 'string' &&
+        typeof preset?.params === 'object',
+    )
+  } catch (error) {
+    console.warn('Failed to parse saved presets', error)
+    return []
+  }
+}
+
+const persistPresets = (presets: SavedPreset[]) => {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  try {
+    window.localStorage.setItem(storageKey, JSON.stringify(presets))
+  } catch (error) {
+    console.warn('Failed to persist presets', error)
+  }
+}
+
+const createPreset = (name: string, params: NoiseParams): SavedPreset => ({
+  id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+  name,
+  params: cloneParams(params),
+})
+
 export const useNoiseStore = create<NoiseStoreState>((set) => ({
-  params: defaultParams,
-  toggles: defaultToggles,
+  params: cloneParams(defaultParams),
+  toggles: cloneToggles(defaultToggles),
+  presets: readPresets(),
   setParam: (key, value) =>
     set((state) => ({
       params: {
@@ -93,8 +153,8 @@ export const useNoiseStore = create<NoiseStoreState>((set) => ({
     })),
   resetParams: () =>
     set(() => ({
-      params: defaultParams,
-      toggles: defaultToggles,
+      params: cloneParams(defaultParams),
+      toggles: cloneToggles(defaultToggles),
     })),
   toggleFlag: (flag) =>
     set((state) => ({
@@ -103,4 +163,31 @@ export const useNoiseStore = create<NoiseStoreState>((set) => ({
         [flag]: !state.toggles[flag],
       },
     })),
+  savePreset: (name) => {
+    const trimmed = name.trim()
+    if (!trimmed) {
+      return
+    }
+    set((state) => {
+      const nextPresets = [...state.presets, createPreset(trimmed, state.params)]
+      persistPresets(nextPresets)
+      return { presets: nextPresets }
+    })
+  },
+  loadPreset: (id) =>
+    set((state) => {
+      const preset = state.presets.find((entry) => entry.id === id)
+      if (!preset) {
+        return state
+      }
+      return {
+        params: cloneParams(preset.params),
+      }
+    }),
+  deletePreset: (id) =>
+    set((state) => {
+      const nextPresets = state.presets.filter((preset) => preset.id !== id)
+      persistPresets(nextPresets)
+      return { presets: nextPresets }
+    }),
 }))
