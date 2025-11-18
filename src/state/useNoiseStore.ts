@@ -50,7 +50,7 @@ export interface SliderDefinition {
 export const sliderDefinitions: Record<SliderParamKey, SliderDefinition> = {
   amplitude: { label: 'Displacement', min: 0, max: 6, step: 0.05, precision: 2 },
   falloff: { label: 'FALLOFF', min: 0, max: 10, step: 0.05, precision: 2 },
-  clamp: { label: 'CLAMP', min: 0, max: 6, step: 0.05, precision: 2 },
+  clamp: { label: 'CLAMP OUTSIDE', min: 0, max: 6, step: 0.05, precision: 2 },
   frequency: { label: 'Frequency', min: 0, max: 4, step: 0.05, precision: 3 },
   roughness: { label: 'Roughness', min: 0, max: 1.6, step: 0.05, precision: 2 },
   warp: { label: 'Warp', min: 0, max: 2.5, step: 0.05, precision: 2 },

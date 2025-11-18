@@ -20,6 +20,7 @@
 ## Controls
 - **Noise Mode** dropdown switches between simplex, ridge, and warped layering styles.
 - **Sliders:** Displacement (amplitude), Frequency, Roughness (octave falloff), Warp (domain warp), Ridge sharpening, and Seed all map directly to the modifier pipeline.
+- **Clamp Outside** slider only clips offsets pushing outward along the normals so you can carve inward forms without losing silhouette volume.
 - **Wireframe / Auto Orbit** toggle buttons let you inspect geometry or pause the hero camera sweep.
 - **Presets** panel saves/loading/deletes custom sliders, persisted locally for quick recall.
 - **Pulse Seed** creates a new pseudo-random seed while keeping the rest of the stack untouched.

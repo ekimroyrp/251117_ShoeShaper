@@ -412,12 +412,12 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
         invMaxDistance === 0 ? 0 : Math.min(1, falloffDistances[i] * invMaxDistance)
       const falloffWeight = Math.pow(normalizedDistance, falloffExponent)
       const rawOffset = sample * params.amplitude * falloffWeight
-      const offset =
-        clampLimit === 0
-          ? 0
-          : clampLimit > 0 && Math.abs(rawOffset) > clampLimit
-            ? Math.sign(rawOffset) * clampLimit
-            : rawOffset
+      let offset = rawOffset
+      if (clampLimit === 0) {
+        offset = 0
+      } else if (clampLimit > 0 && rawOffset > clampLimit) {
+        offset = clampLimit
+      }
       displacements[i * 3] = normal.x * offset
       displacements[i * 3 + 1] = normal.y * offset
       displacements[i * 3 + 2] = normal.z * offset
