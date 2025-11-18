@@ -85,7 +85,7 @@ export const sliderDefinitions: Record<SliderParamKey, SliderDefinition> = {
   curlStrength: { label: 'STRENGTH', min: 0, max: 4, step: 0.05, precision: 2 },
   curlScale: { label: 'DETAIL', min: 0.1, max: 3, step: 0.05, precision: 2 },
   alligatorBite: { label: 'WAVE', min: 0, max: 3, step: 0.05, precision: 2 },
-  alligatorPlateau: { label: 'Plateau', min: 0, max: 1, step: 0.02, precision: 2 },
+  alligatorPlateau: { label: 'CRUNCH', min: 0, max: 1, step: 0.02, precision: 2 },
 }
 
 export const sliderOrder: SliderParamKey[] = [
