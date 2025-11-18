@@ -412,9 +412,10 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
       position.set(positions.getX(i), positions.getY(i), positions.getZ(i))
       normal.set(normals.getX(i), normals.getY(i), normals.getZ(i)).normalize()
       noisePoint.copy(position)
+      const scaleX = Math.max(0.1, params.scaleX ?? 1)
       const scaleY = Math.max(0.1, params.scaleY ?? 1)
       const scaleZ = Math.max(0.1, params.scaleZ ?? 1)
-      noisePoint.x += params.offsetX
+      noisePoint.x = (noisePoint.x + params.offsetX) / scaleX
       noisePoint.y = (noisePoint.y + params.offsetY) / scaleY
       noisePoint.z = (noisePoint.z + params.offsetZ) / scaleZ
       const sample = sampleNoise(simplex, params.noiseType, noisePoint, normal, params)
@@ -461,6 +462,7 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     params.offsetX,
     params.offsetY,
     params.offsetZ,
+    params.scaleX,
     params.scaleY,
     params.scaleZ,
     params.ridge,

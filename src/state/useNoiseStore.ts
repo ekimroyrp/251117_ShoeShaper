@@ -10,6 +10,7 @@ export interface NoiseParams {
   clamp: number
   clampInside: number
   offsetX: number
+  scaleX: number
   offsetY: number
   scaleY: number
   offsetZ: number
@@ -61,6 +62,7 @@ export const sliderDefinitions: Record<SliderParamKey, SliderDefinition> = {
   offsetX: { label: 'OFFSET X', min: -40, max: 40, step: 0.25, precision: 2 },
   offsetY: { label: 'OFFSET Y', min: -40, max: 40, step: 0.25, precision: 2 },
   offsetZ: { label: 'OFFSET Z', min: -40, max: 40, step: 0.25, precision: 2 },
+  scaleX: { label: 'SCALE X', min: 0.1, max: 5, step: 0.05, precision: 2 },
   scaleY: { label: 'SCALE Y', min: 0.1, max: 5, step: 0.05, precision: 2 },
   scaleZ: { label: 'SCALE Z', min: 0.1, max: 5, step: 0.05, precision: 2 },
   frequency: { label: 'Frequency', min: 0, max: 4, step: 0.05, precision: 3 },
@@ -94,6 +96,7 @@ export const sliderOrder: SliderParamKey[] = [
   'offsetX',
   'offsetY',
   'offsetZ',
+  'scaleX',
   'scaleY',
   'scaleZ',
   'seed',
@@ -108,6 +111,7 @@ export const baseSliderKeys: SliderParamKey[] = [
   'offsetX',
   'offsetY',
   'offsetZ',
+  'scaleX',
   'scaleY',
   'scaleZ',
   'seed',
@@ -153,6 +157,7 @@ const defaultParams: NoiseParams = {
   clamp: 0.6,
   clampInside: 1,
   offsetX: 0.5,
+  scaleX: 0.5,
   offsetY: 6.5,
   scaleY: 0.9,
   offsetZ: 4,
