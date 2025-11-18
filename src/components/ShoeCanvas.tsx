@@ -45,6 +45,7 @@ export const ShoeCanvas = () => {
         </Suspense>
         <OrbitControls autoRotate={toggles.autoRotate} enabled={!falloffDragging} target={[0, 2, 0]} />
       </Canvas>
+      <div className="canvas-tip">LEFT CLICK TO ORBIT · RIGHT CLICK TO PAN · SCROLL TO ZOOM</div>
     </section>
   )
 }
