@@ -19,7 +19,7 @@
 
 ## Controls
 - **Noise Mode** dropdown now includes a NONE option that bypasses displacement (and hides sliders) plus the usual simplex, ridge, warped, Worley, curl, and alligator modes.
-- **Sliders:** Displacement (amplitude), Frequency, Roughness (octave falloff), Warp (domain warp), Ridge sharpening, Clamp Outside/Inside, Offset X/Y/Z, Scale X/Y/Z, Rotate Z, and Seed all map directly to the modifier pipeline.
+- **Sliders:** Displacement (amplitude), Frequency, Roughness (octave falloff), Warp (domain warp), Ridge sharpening, Clamp Outside/Inside, Offset X/Y/Z, Scale X/Y/Z, Rotate X/Y/Z, and Seed all map directly to the modifier pipeline.
 - **Clamp Outside / Clamp Inside** sliders independently cap outward and inward displacement, letting you preserve silhouette volume while still carving detail.
 - **Wireframe / Auto Orbit** toggle buttons let you inspect geometry or pause the hero camera sweep.
 - **Presets** panel saves/loading/deletes custom sliders, persisted locally for quick recall.

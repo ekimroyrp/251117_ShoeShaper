@@ -420,6 +420,24 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
       noisePoint.x = (noisePoint.x + params.offsetX) / scaleX
       noisePoint.y = (noisePoint.y + params.offsetY) / scaleY
       noisePoint.z = (noisePoint.z + params.offsetZ) / scaleZ
+      if (params.rotateX) {
+        const angle = (params.rotateX * Math.PI) / 180
+        const cos = Math.cos(angle)
+        const sin = Math.sin(angle)
+        const rotatedY = noisePoint.y * cos - noisePoint.z * sin
+        const rotatedZ = noisePoint.y * sin + noisePoint.z * cos
+        noisePoint.y = rotatedY
+        noisePoint.z = rotatedZ
+      }
+      if (params.rotateY) {
+        const angle = (params.rotateY * Math.PI) / 180
+        const cos = Math.cos(angle)
+        const sin = Math.sin(angle)
+        const rotatedX = noisePoint.x * cos + noisePoint.z * sin
+        const rotatedZ = -noisePoint.x * sin + noisePoint.z * cos
+        noisePoint.x = rotatedX
+        noisePoint.z = rotatedZ
+      }
       if (params.rotateZ) {
         const angle = (params.rotateZ * Math.PI) / 180
         const cos = Math.cos(angle)
@@ -473,8 +491,10 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     params.offsetX,
     params.offsetY,
     params.offsetZ,
-    params.scaleX,
+    params.rotateX,
+    params.rotateY,
     params.rotateZ,
+    params.scaleX,
     params.scaleY,
     params.scaleZ,
     params.ridge,
