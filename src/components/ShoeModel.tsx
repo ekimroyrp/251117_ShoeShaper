@@ -387,7 +387,8 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     const simplex = createNoiseGenerator(params.seed)
     const normal = new Vector3()
     const position = new Vector3()
-    const clampLimit = Math.max(0, params.clamp ?? 0)
+    const clampOutside = Math.max(0, params.clamp ?? 0)
+    const clampInside = Math.max(0, params.clampInside ?? 0)
     const falloffCenter = new Vector3(params.falloffCenterX, FLOOR_Y, params.falloffCenterZ)
     const falloffDistances = new Float32Array(positions.count)
     let maxDistance = 0
@@ -413,10 +414,10 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
       const falloffWeight = Math.pow(normalizedDistance, falloffExponent)
       const rawOffset = sample * params.amplitude * falloffWeight
       let offset = rawOffset
-      if (clampLimit === 0) {
-        offset = 0
-      } else if (clampLimit > 0 && rawOffset > clampLimit) {
-        offset = clampLimit
+      if (clampOutside > 0 && rawOffset > clampOutside) {
+        offset = clampOutside
+      } else if (clampInside > 0 && rawOffset < -clampInside) {
+        offset = -clampInside
       }
       displacements[i * 3] = normal.x * offset
       displacements[i * 3 + 1] = normal.y * offset
@@ -440,6 +441,7 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     params.alligatorBite,
     params.alligatorPlateau,
     params.clamp,
+    params.clampInside,
     params.curlScale,
     params.curlStrength,
     params.falloff,

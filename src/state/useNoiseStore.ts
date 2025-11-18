@@ -8,6 +8,7 @@ export interface NoiseParams {
   seed: number
   amplitude: number
   clamp: number
+  clampInside: number
   resolution: number
   falloff: number
   falloffCenterX: number
@@ -51,6 +52,7 @@ export const sliderDefinitions: Record<SliderParamKey, SliderDefinition> = {
   amplitude: { label: 'Displacement', min: 0, max: 6, step: 0.05, precision: 2 },
   falloff: { label: 'FALLOFF', min: 0, max: 10, step: 0.05, precision: 2 },
   clamp: { label: 'CLAMP OUTSIDE', min: 0, max: 6, step: 0.05, precision: 2 },
+  clampInside: { label: 'CLAMP INSIDE', min: 0, max: 6, step: 0.05, precision: 2 },
   frequency: { label: 'Frequency', min: 0, max: 4, step: 0.05, precision: 3 },
   roughness: { label: 'Roughness', min: 0, max: 1.6, step: 0.05, precision: 2 },
   warp: { label: 'Warp', min: 0, max: 2.5, step: 0.05, precision: 2 },
@@ -68,6 +70,7 @@ export const sliderOrder: SliderParamKey[] = [
   'amplitude',
   'falloff',
   'clamp',
+  'clampInside',
   'frequency',
   'roughness',
   'warp',
@@ -81,7 +84,14 @@ export const sliderOrder: SliderParamKey[] = [
   'seed',
 ]
 
-export const baseSliderKeys: SliderParamKey[] = ['amplitude', 'falloff', 'clamp', 'frequency', 'seed']
+export const baseSliderKeys: SliderParamKey[] = [
+  'amplitude',
+  'falloff',
+  'clamp',
+  'clampInside',
+  'frequency',
+  'seed',
+]
 
 export const algorithmSliderMap: Record<NoiseAlgorithm, SliderParamKey[]> = {
   simplex: ['roughness', 'warp'],
@@ -121,6 +131,7 @@ const defaultParams: NoiseParams = {
   seed: 4683,
   amplitude: 3.3,
   clamp: 0.6,
+  clampInside: 1,
   resolution: 1,
   falloff: 1.75,
   falloffCenterX: 0,
