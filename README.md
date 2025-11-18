@@ -7,7 +7,7 @@
 - BaseShoe.obj is bundled inside `public/models` and displaced directly on the CPU with seeded simplex noise (no rebuild step required).
 - Cyberpunk control deck cloned from the reference project, including neon sliders, dropdowns, and toggle actions.
 - Local preset manager persists custom slider stacks in `localStorage`, so you can recall favorite noise fields instantly.
-- Parameter store tracks amplitude, frequency, warp, ridge strength, X/Y/Z offsets, per-axis scaling, wireframe, and autorotation so UI + scene stay in sync.
+- Parameter store tracks amplitude, frequency, warp, ridge strength, X/Y/Z offsets, per-axis scaling/rotation, wireframe, and autorotation so UI + scene stay in sync.
 - Canvas scene ships with HDR environment, dual key lights, stats overlay, a domain-warped noise shader, and runtime-safe OBJ loading with error surfaces.
 - Algorithm-specific sliders (Worley Shift / Blend, Curl Strength / Detail, Alligator Wave / Plateau) directly remap the sculpted surface so every noise mode has responsive controls.
 
@@ -19,7 +19,7 @@
 
 ## Controls
 - **Noise Mode** dropdown now includes a NONE option that bypasses displacement (and hides sliders) plus the usual simplex, ridge, warped, Worley, curl, and alligator modes.
-- **Sliders:** Displacement (amplitude), Frequency, Roughness (octave falloff), Warp (domain warp), Ridge sharpening, Clamp Outside/Inside, Offset X/Y/Z, Scale X/Y/Z, and Seed all map directly to the modifier pipeline.
+- **Sliders:** Displacement (amplitude), Frequency, Roughness (octave falloff), Warp (domain warp), Ridge sharpening, Clamp Outside/Inside, Offset X/Y/Z, Scale X/Y/Z, Rotate Z, and Seed all map directly to the modifier pipeline.
 - **Clamp Outside / Clamp Inside** sliders independently cap outward and inward displacement, letting you preserve silhouette volume while still carving detail.
 - **Wireframe / Auto Orbit** toggle buttons let you inspect geometry or pause the hero camera sweep.
 - **Presets** panel saves/loading/deletes custom sliders, persisted locally for quick recall.

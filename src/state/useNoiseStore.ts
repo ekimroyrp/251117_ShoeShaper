@@ -15,6 +15,7 @@ export interface NoiseParams {
   scaleY: number
   offsetZ: number
   scaleZ: number
+  rotateZ: number
   resolution: number
   falloff: number
   falloffCenterX: number
@@ -65,6 +66,7 @@ export const sliderDefinitions: Record<SliderParamKey, SliderDefinition> = {
   scaleX: { label: 'SCALE X', min: 0.1, max: 5, step: 0.05, precision: 2 },
   scaleY: { label: 'SCALE Y', min: 0.1, max: 5, step: 0.05, precision: 2 },
   scaleZ: { label: 'SCALE Z', min: 0.1, max: 5, step: 0.05, precision: 2 },
+  rotateZ: { label: 'ROTATE Z', min: -360, max: 360, step: 1, precision: 0 },
   frequency: { label: 'Frequency', min: 0, max: 4, step: 0.05, precision: 3 },
   roughness: { label: 'Roughness', min: 0, max: 1.6, step: 0.05, precision: 2 },
   warp: { label: 'Warp', min: 0, max: 2.5, step: 0.05, precision: 2 },
@@ -99,6 +101,7 @@ export const sliderOrder: SliderParamKey[] = [
   'scaleX',
   'scaleY',
   'scaleZ',
+  'rotateZ',
   'seed',
 ]
 
@@ -114,6 +117,7 @@ export const baseSliderKeys: SliderParamKey[] = [
   'scaleX',
   'scaleY',
   'scaleZ',
+  'rotateZ',
   'seed',
 ]
 
@@ -163,6 +167,7 @@ const defaultParams: NoiseParams = {
   scaleY: 0.9,
   offsetZ: 4,
   scaleZ: 3.65,
+  rotateZ: 16,
   resolution: 1,
   falloff: 1.75,
   falloffCenterX: 0,
