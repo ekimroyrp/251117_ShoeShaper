@@ -21,6 +21,7 @@ export const NoiseControlPanel = () => {
     setNoiseType,
     randomizeSeed,
     requestExport,
+    requestScreenshot,
     resetParams,
     toggleFlag,
     savePreset,
@@ -99,6 +100,9 @@ export const NoiseControlPanel = () => {
         </button>
         <button type="button" onClick={requestExport}>
           Export Mesh
+        </button>
+        <button type="button" onClick={requestScreenshot}>
+          Take Screenshot
         </button>
         <button type="button" onClick={resetParams}>
           Reset Controls

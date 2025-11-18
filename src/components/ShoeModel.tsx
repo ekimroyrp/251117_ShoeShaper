@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react'
-import { useLoader } from '@react-three/fiber'
+import { useLoader, useThree } from '@react-three/fiber'
 import {
   BufferAttribute,
   BufferGeometry,
@@ -364,6 +364,8 @@ interface ShoeModelProps {
 export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
   const obj = useLoader(OBJLoader, '/models/BaseShoe.obj')
   const exportCounter = useNoiseStore((state) => state.exportCounter)
+  const screenshotCounter = useNoiseStore((state) => state.screenshotCounter)
+  const { gl, scene, camera } = useThree()
 
   const baseGeometry = useMemo(() => {
     const geometry = gatherGeometry(obj)
@@ -533,6 +535,26 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
   }, [exportCounter])
+
+  useEffect(() => {
+    if (screenshotCounter === 0) {
+      return
+    }
+    gl.render(scene, camera)
+    gl.domElement.toBlob((blob) => {
+      if (!blob) {
+        return
+      }
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `shoeshaper-screenshot-${screenshotCounter}.png`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    }, 'image/png')
+  }, [camera, gl, scene, screenshotCounter])
 
   const material = useMemo(
     () =>
