@@ -85,27 +85,24 @@ export const NoiseControlPanel = () => {
         })}
       </div>
 
-      <div className="panel-section toggle-grid">
+      <div className="panel-actions panel-actions--grid">
+        <button type="button" onClick={randomizeSeed}>
+          Pulse Seed
+        </button>
+        <button type="button" onClick={resetParams}>
+          Reset Controls
+        </button>
         <button type="button" onClick={() => toggleFlag('wireframe')}>
           {toggles.wireframe ? 'Hide Wireframe' : 'Show Wireframe'}
         </button>
         <button type="button" onClick={() => toggleFlag('autoRotate')}>
           {toggles.autoRotate ? 'Pause Orbit' : 'Auto Orbit'}
         </button>
-      </div>
-
-      <div className="panel-actions">
-        <button type="button" onClick={randomizeSeed}>
-          Pulse Seed
-        </button>
         <button type="button" onClick={requestExport}>
           Export Mesh
         </button>
         <button type="button" onClick={requestScreenshot}>
           Take Screenshot
-        </button>
-        <button type="button" onClick={resetParams}>
-          Reset Controls
         </button>
       </div>
 
