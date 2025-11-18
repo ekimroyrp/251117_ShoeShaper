@@ -156,6 +156,7 @@ interface NoiseStoreState {
   falloffDragging: boolean
   exportCounter: number
   screenshotCounter: number
+  screenshotActive: boolean
   setParam: (key: NumericParamKey, value: number) => void
   setNoiseType: (algorithm: NoiseAlgorithm) => void
   randomizeSeed: () => void
@@ -169,6 +170,7 @@ interface NoiseStoreState {
   deletePreset: (id: string) => void
   requestExport: () => void
   requestScreenshot: () => void
+  setScreenshotActive: (active: boolean) => void
 }
 
 const defaultParams: NoiseParams = {
@@ -267,6 +269,7 @@ export const useNoiseStore = create<NoiseStoreState>((set) => ({
   falloffDragging: false,
   exportCounter: 0,
   screenshotCounter: 0,
+  screenshotActive: false,
   setParam: (key, value) =>
     set((state) => ({
       params: {
@@ -359,5 +362,9 @@ export const useNoiseStore = create<NoiseStoreState>((set) => ({
   requestScreenshot: () =>
     set((state) => ({
       screenshotCounter: state.screenshotCounter + 1,
+    })),
+  setScreenshotActive: (active) =>
+    set(() => ({
+      screenshotActive: active,
     })),
 }))

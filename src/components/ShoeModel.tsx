@@ -366,6 +366,7 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
   const exportCounter = useNoiseStore((state) => state.exportCounter)
   const screenshotCounter = useNoiseStore((state) => state.screenshotCounter)
   const { gl, scene, camera } = useThree()
+  const setScreenshotActive = useNoiseStore((state) => state.setScreenshotActive)
 
   const baseGeometry = useMemo(() => {
     const geometry = gatherGeometry(obj)
@@ -540,21 +541,25 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     if (screenshotCounter === 0) {
       return
     }
-    gl.render(scene, camera)
-    gl.domElement.toBlob((blob) => {
-      if (!blob) {
-        return
-      }
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `shoeshaper-screenshot-${screenshotCounter}.png`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
-    }, 'image/png')
-  }, [camera, gl, scene, screenshotCounter])
+    setScreenshotActive(true)
+    requestAnimationFrame(() => {
+      gl.render(scene, camera)
+      gl.domElement.toBlob((blob) => {
+        setScreenshotActive(false)
+        if (!blob) {
+          return
+        }
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `shoeshaper-screenshot-${screenshotCounter}.png`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+      }, 'image/png')
+    })
+  }, [camera, gl, scene, screenshotCounter, setScreenshotActive])
 
   const material = useMemo(
     () =>

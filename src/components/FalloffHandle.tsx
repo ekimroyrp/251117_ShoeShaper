@@ -14,6 +14,7 @@ export const FalloffHandle = () => {
   const falloffCenterX = useNoiseStore((state) => state.params.falloffCenterX)
   const falloffCenterY = useNoiseStore((state) => state.params.falloffCenterY)
   const falloffCenterZ = useNoiseStore((state) => state.params.falloffCenterZ)
+  const screenshotActive = useNoiseStore((state) => state.screenshotActive)
   const setFalloffCenter = useNoiseStore((state) => state.setFalloffCenter)
   const setFalloffHeight = useNoiseStore((state) => state.setFalloffHeight)
   const setFalloffDragging = useNoiseStore((state) => state.setFalloffDragging)
@@ -32,7 +33,7 @@ export const FalloffHandle = () => {
     target?.releasePointerCapture?.(event.pointerId)
   }
 
-  if (noiseType === 'none') {
+  if (noiseType === 'none' || screenshotActive) {
     return null
   }
 
