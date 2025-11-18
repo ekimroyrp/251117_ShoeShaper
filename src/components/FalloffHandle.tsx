@@ -11,6 +11,7 @@ const HANDLE_RADIUS = 0.24
 const LABEL_OFFSET = 0.6
 
 export const FalloffHandle = () => {
+  const noiseType = useNoiseStore((state) => state.params.noiseType)
   const falloffCenterX = useNoiseStore((state) => state.params.falloffCenterX)
   const falloffCenterZ = useNoiseStore((state) => state.params.falloffCenterZ)
   const setFalloffCenter = useNoiseStore((state) => state.setFalloffCenter)
@@ -27,6 +28,10 @@ export const FalloffHandle = () => {
   const releasePointer = (event: ThreeEvent<PointerEvent>) => {
     const target = event.target as EventTarget & { releasePointerCapture?: (pointerId: number) => void } | null
     target?.releasePointerCapture?.(event.pointerId)
+  }
+
+  if (noiseType === 'none') {
+    return null
   }
 
   return (
