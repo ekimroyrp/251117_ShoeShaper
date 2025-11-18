@@ -484,6 +484,60 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     }
 
     positions.needsUpdate = true
+    if (params.smoothing > 0) {
+      const smoothing = Math.min(1, Math.max(0, params.smoothing))
+      const originalPositions = positions.array.slice(0) as Float32Array
+      const adjacency: Array<Set<number>> = Array.from({ length: positions.count }, () => new Set())
+      const buildAdjacency = (a: number, b: number) => {
+        adjacency[a].add(b)
+        adjacency[b].add(a)
+      }
+      if (geometry.getIndex()) {
+        const index = geometry.getIndex() as BufferAttribute
+        for (let i = 0; i < index.count; i += 3) {
+          const a = index.getX(i)
+          const b = index.getX(i + 1)
+          const c = index.getX(i + 2)
+          buildAdjacency(a, b)
+          buildAdjacency(b, c)
+          buildAdjacency(c, a)
+        }
+      } else {
+        for (let i = 0; i < positions.count; i += 3) {
+          buildAdjacency(i, i + 1)
+          buildAdjacency(i + 1, i + 2)
+          buildAdjacency(i + 2, i)
+        }
+      }
+      for (let i = 0; i < positions.count; i += 1) {
+        const neighbors = adjacency[i]
+        if (neighbors.size === 0) {
+          continue
+        }
+        let avgX = 0
+        let avgY = 0
+        let avgZ = 0
+        neighbors.forEach((neighbor) => {
+          avgX += originalPositions[neighbor * 3]
+          avgY += originalPositions[neighbor * 3 + 1]
+          avgZ += originalPositions[neighbor * 3 + 2]
+        })
+        const inv = 1 / neighbors.size
+        avgX *= inv
+        avgY *= inv
+        avgZ *= inv
+        const origX = originalPositions[i * 3]
+        const origY = originalPositions[i * 3 + 1]
+        const origZ = originalPositions[i * 3 + 2]
+        positions.setXYZ(
+          i,
+          origX + (avgX - origX) * smoothing,
+          origY + (avgY - origY) * smoothing,
+          origZ + (avgZ - origZ) * smoothing,
+        )
+      }
+    }
+
     geometry.computeVertexNormals()
 
     return weldGeometry(geometry)
@@ -516,6 +570,7 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     params.warp,
     params.worleyBlend,
     params.worleyJitter,
+    params.smoothing,
     sculptGeometry,
   ])
 

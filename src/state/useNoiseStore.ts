@@ -10,6 +10,7 @@ export interface NoiseParams {
   amplitude: number
   clamp: number
   clampInside: number
+  smoothing: number
   offsetX: number
   scaleX: number
   offsetY: number
@@ -64,6 +65,7 @@ export const sliderDefinitions: Record<SliderParamKey, SliderDefinition> = {
   falloff: { label: 'FALLOFF', min: 0, max: 10, step: 0.05, precision: 2 },
   clamp: { label: 'CLAMP OUTSIDE', min: 0, max: 6, step: 0.05, precision: 2 },
   clampInside: { label: 'CLAMP INSIDE', min: 0, max: 6, step: 0.05, precision: 2 },
+  smoothing: { label: 'SMOOTHING', min: 0, max: 1, step: 0.01, precision: 2 },
   offsetX: { label: 'OFFSET X', min: -40, max: 40, step: 0.25, precision: 2 },
   offsetY: { label: 'OFFSET Y', min: -40, max: 40, step: 0.25, precision: 2 },
   offsetZ: { label: 'OFFSET Z', min: -40, max: 40, step: 0.25, precision: 2 },
@@ -101,6 +103,7 @@ export const sliderOrder: SliderParamKey[] = [
   'curlScale',
   'alligatorBite',
   'alligatorPlateau',
+  'smoothing',
   'offsetX',
   'offsetY',
   'offsetZ',
@@ -119,6 +122,7 @@ export const baseSliderKeys: SliderParamKey[] = [
   'clamp',
   'clampInside',
   'frequency',
+  'smoothing',
   'offsetX',
   'offsetY',
   'offsetZ',
@@ -178,6 +182,7 @@ const defaultParams: NoiseParams = {
   amplitude: 3.3,
   clamp: 0.6,
   clampInside: 1,
+  smoothing: 0.73,
   offsetX: 0.5,
   scaleX: 0.55,
   offsetY: 6.5,
