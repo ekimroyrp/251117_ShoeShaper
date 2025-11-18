@@ -58,11 +58,11 @@ export const sliderDefinitions: Record<SliderParamKey, SliderDefinition> = {
   warp: { label: 'Warp', min: 0, max: 2.5, step: 0.05, precision: 2 },
   ridge: { label: 'Ridge', min: 0, max: 1, step: 0.02, precision: 2 },
   seed: { label: 'Seed', min: 1, max: 9999, step: 1, precision: 0 },
-  worleyJitter: { label: 'Cell Jitter', min: 0, max: 1, step: 0.01, precision: 2 },
-  worleyBlend: { label: 'Edge Blend', min: 0, max: 1, step: 0.01, precision: 2 },
-  curlStrength: { label: 'Curl Strength', min: 0, max: 4, step: 0.05, precision: 2 },
-  curlScale: { label: 'Curl Detail', min: 0.1, max: 3, step: 0.05, precision: 2 },
-  alligatorBite: { label: 'Bite', min: 0, max: 3, step: 0.05, precision: 2 },
+  worleyJitter: { label: 'SHIFT', min: 0, max: 1, step: 0.01, precision: 2 },
+  worleyBlend: { label: 'BLEND', min: 0, max: 1, step: 0.01, precision: 2 },
+  curlStrength: { label: 'STRENGTH', min: 0, max: 4, step: 0.05, precision: 2 },
+  curlScale: { label: 'DETAIL', min: 0.1, max: 3, step: 0.05, precision: 2 },
+  alligatorBite: { label: 'WAVE', min: 0, max: 3, step: 0.05, precision: 2 },
   alligatorPlateau: { label: 'Plateau', min: 0, max: 1, step: 0.02, precision: 2 },
 }
 
@@ -140,12 +140,12 @@ const defaultParams: NoiseParams = {
   roughness: 0.15,
   warp: 0.25,
   ridge: 0.3,
-  worleyJitter: 0.75,
-  worleyBlend: 0.4,
+  worleyJitter: 0.5,
+  worleyBlend: 0.1,
   curlStrength: 1.2,
   curlScale: 1,
-  alligatorBite: 0.8,
-  alligatorPlateau: 0.4,
+  alligatorBite: 2,
+  alligatorPlateau: 0.12,
   noiseType: 'simplex',
 }
 
