@@ -313,7 +313,9 @@ const curlNoise = (
     (v1.x - v2.x - (v5.y - v6.y)) / (2 * eps),
   )
 
-  return curl.dot(normal) * params.curlStrength
+  const magnitude = Math.min(1, curl.length())
+  const direction = Math.sign(curl.dot(normal)) || 1
+  return magnitude * direction * params.curlStrength
 }
 
 const alligatorNoise = (simplex: NoiseFunction3D, point: Vector3, params: NoiseParams) => {

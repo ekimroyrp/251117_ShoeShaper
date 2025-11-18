@@ -157,7 +157,7 @@ const defaultParams: NoiseParams = {
   ridge: 0.3,
   worleyJitter: 0.5,
   worleyBlend: 0.1,
-  curlStrength: 1.2,
+  curlStrength: 0.2,
   curlScale: 1,
   alligatorBite: 2,
   alligatorPlateau: 0.12,
