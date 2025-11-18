@@ -3,7 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { Billboard, Text } from '@react-three/drei'
 import { Group, Quaternion, Vector3 } from 'three'
 
-const cameraSpaceOffset = new Vector3(-2.2, -1.8, -6)
+const cameraSpaceOffset = new Vector3(-3.2, -1.6, -6)
 const worldOrientation = new Quaternion() // identity to align with world axes
 
 export const AxisWidget = () => {
