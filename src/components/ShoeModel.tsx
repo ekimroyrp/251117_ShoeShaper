@@ -437,7 +437,11 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     return weldGeometry(geometry)
   }, [
     params.amplitude,
+    params.alligatorBite,
+    params.alligatorPlateau,
     params.clamp,
+    params.curlScale,
+    params.curlStrength,
     params.falloff,
     params.falloffCenterX,
     params.falloffCenterZ,
@@ -447,6 +451,8 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     params.roughness,
     params.seed,
     params.warp,
+    params.worleyBlend,
+    params.worleyJitter,
     sculptGeometry,
   ])
 

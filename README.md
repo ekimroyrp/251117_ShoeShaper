@@ -9,6 +9,7 @@
 - Local preset manager persists custom slider stacks in `localStorage`, so you can recall favorite noise fields instantly.
 - Parameter store tracks amplitude, frequency, warp, ridge strength, wireframe, and autorotation so UI + scene stay in sync.
 - Canvas scene ships with HDR environment, dual key lights, stats overlay, a domain-warped noise shader, and runtime-safe OBJ loading with error surfaces.
+- Algorithm-specific sliders (Worley Cell Jitter / Edge Blend, Curl Strength / Detail, Alligator Bite / Plateau) directly remap the sculpted surface so every noise mode has responsive controls.
 
 ## Getting Started
 1. `npm install`
