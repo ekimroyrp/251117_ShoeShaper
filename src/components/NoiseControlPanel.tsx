@@ -58,7 +58,7 @@ export const NoiseControlPanel = () => {
         label="RESOLUTION"
         value={params.resolution}
         onSelect={(next) => setParam('resolution', next)}
-        options={resolutionOptions.map((level) => ({ label: `Level ${level}`, value: level }))}
+        options={resolutionOptions.map((level) => ({ label: `Level ${level + 1}`, value: level }))}
       />
 
       <SelectField
