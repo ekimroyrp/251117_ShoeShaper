@@ -387,6 +387,7 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     const simplex = createNoiseGenerator(params.seed)
     const normal = new Vector3()
     const position = new Vector3()
+    const noisePoint = new Vector3()
     const clampOutside = Math.max(0, params.clamp ?? 0)
     const clampInside = Math.max(0, params.clampInside ?? 0)
     const falloffCenter = new Vector3(params.falloffCenterX, FLOOR_Y, params.falloffCenterZ)
@@ -408,7 +409,11 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     for (let i = 0; i < positions.count; i += 1) {
       position.set(positions.getX(i), positions.getY(i), positions.getZ(i))
       normal.set(normals.getX(i), normals.getY(i), normals.getZ(i)).normalize()
-      const sample = sampleNoise(simplex, params.noiseType, position, normal, params)
+      noisePoint.copy(position)
+      noisePoint.x += params.offsetX
+      noisePoint.y += params.offsetY
+      noisePoint.z += params.offsetZ
+      const sample = sampleNoise(simplex, params.noiseType, noisePoint, normal, params)
       const normalizedDistance =
         invMaxDistance === 0 ? 0 : Math.min(1, falloffDistances[i] * invMaxDistance)
       const falloffWeight = Math.pow(normalizedDistance, falloffExponent)
@@ -449,6 +454,9 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     params.falloffCenterZ,
     params.frequency,
     params.noiseType,
+    params.offsetX,
+    params.offsetY,
+    params.offsetZ,
     params.ridge,
     params.roughness,
     params.seed,
