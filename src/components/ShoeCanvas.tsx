@@ -22,8 +22,20 @@ export const ShoeCanvas = () => {
       >
         <color attach="background" args={['#030805']} />
         <hemisphereLight args={['#aaffcb', '#031107', 0.25]} />
-        <directionalLight position={[5, 8, 5]} intensity={2} castShadow shadow-mapSize={[2048, 2048]} />
-        <directionalLight position={[-4, -6, -4]} intensity={0.4} />
+        <directionalLight
+          position={[5, 8, 5]}
+          intensity={2}
+          castShadow
+          shadow-mapSize={[2048, 2048]}
+          shadow-bias={-0.001}
+          shadow-normalBias={0.02}
+        />
+        <directionalLight
+          position={[-4, -6, -4]}
+          intensity={0.4}
+          shadow-bias={-0.001}
+          shadow-normalBias={0.02}
+        />
         <Environment preset="night" />
         <Suspense fallback={<CanvasLoader />}>
           <ShoeModel params={params} toggles={toggles} />

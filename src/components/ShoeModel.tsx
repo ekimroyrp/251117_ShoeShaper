@@ -637,7 +637,7 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
 
   return (
     <group position={[0, 2, 0]}>
-      <mesh geometry={displacedGeometry} material={material} castShadow receiveShadow />
+      <mesh geometry={displacedGeometry} material={material} castShadow receiveShadow={false} />
     </group>
   )
 }
