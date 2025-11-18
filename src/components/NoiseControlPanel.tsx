@@ -78,7 +78,25 @@ export const NoiseControlPanel = () => {
         })}
       </div>
 
-      <div className="panel-section">
+      <div className="panel-section toggle-grid">
+        <button type="button" onClick={() => toggleFlag('wireframe')}>
+          {toggles.wireframe ? 'Hide Wireframe' : 'Show Wireframe'}
+        </button>
+        <button type="button" onClick={() => toggleFlag('autoRotate')}>
+          {toggles.autoRotate ? 'Pause Orbit' : 'Auto Orbit'}
+        </button>
+      </div>
+
+      <div className="panel-actions">
+        <button type="button" onClick={randomizeSeed}>
+          Pulse Seed
+        </button>
+        <button type="button" onClick={resetParams}>
+          Reset Controls
+        </button>
+      </div>
+
+      <div className="panel-section panel-section--preset">
         <label className="panel-label" htmlFor="preset-name">
           Save Preset
         </label>
@@ -117,24 +135,6 @@ export const NoiseControlPanel = () => {
             ))
           )}
         </div>
-      </div>
-
-      <div className="panel-section toggle-grid">
-        <button type="button" onClick={() => toggleFlag('wireframe')}>
-          {toggles.wireframe ? 'Hide Wireframe' : 'Show Wireframe'}
-        </button>
-        <button type="button" onClick={() => toggleFlag('autoRotate')}>
-          {toggles.autoRotate ? 'Pause Orbit' : 'Auto Orbit'}
-        </button>
-      </div>
-
-      <div className="panel-actions">
-        <button type="button" onClick={randomizeSeed}>
-          Pulse Seed
-        </button>
-        <button type="button" onClick={resetParams}>
-          Reset Controls
-        </button>
       </div>
     </aside>
   )
