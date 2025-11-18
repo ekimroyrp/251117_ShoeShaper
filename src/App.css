@@ -54,6 +54,27 @@
   bottom: 0;
   z-index: 2;
   overflow-y: auto;
+  scrollbar-color: rgba(32, 255, 138, 0.8) rgba(2, 10, 7, 0.8);
+  scrollbar-width: thin;
+}
+
+.control-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.control-panel::-webkit-scrollbar-track {
+  background: rgba(2, 10, 7, 0.75);
+  border-radius: 4px;
+}
+
+.control-panel::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(32, 255, 138, 0.85), rgba(10, 60, 36, 0.9));
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(32, 255, 138, 0.4);
+}
+
+.control-panel::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(95, 255, 186, 0.95), rgba(18, 80, 48, 0.95));
 }
 
 .panel-header h1 {
