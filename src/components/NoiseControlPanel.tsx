@@ -20,6 +20,7 @@ export const NoiseControlPanel = () => {
     setParam,
     setNoiseType,
     randomizeSeed,
+    requestExport,
     resetParams,
     toggleFlag,
     savePreset,
@@ -95,6 +96,9 @@ export const NoiseControlPanel = () => {
       <div className="panel-actions">
         <button type="button" onClick={randomizeSeed}>
           Pulse Seed
+        </button>
+        <button type="button" onClick={requestExport}>
+          Export Mesh
         </button>
         <button type="button" onClick={resetParams}>
           Reset Controls

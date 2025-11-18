@@ -154,6 +154,7 @@ interface NoiseStoreState {
   toggles: NoiseToggles
   presets: SavedPreset[]
   falloffDragging: boolean
+  exportCounter: number
   setParam: (key: NumericParamKey, value: number) => void
   setNoiseType: (algorithm: NoiseAlgorithm) => void
   randomizeSeed: () => void
@@ -165,6 +166,7 @@ interface NoiseStoreState {
   savePreset: (name: string) => void
   loadPreset: (id: string) => void
   deletePreset: (id: string) => void
+  requestExport: () => void
 }
 
 const defaultParams: NoiseParams = {
@@ -261,6 +263,7 @@ export const useNoiseStore = create<NoiseStoreState>((set) => ({
   toggles: cloneToggles(defaultToggles),
   presets: readPresets(),
   falloffDragging: false,
+  exportCounter: 0,
   setParam: (key, value) =>
     set((state) => ({
       params: {
@@ -346,4 +349,8 @@ export const useNoiseStore = create<NoiseStoreState>((set) => ({
       persistPresets(nextPresets)
       return { presets: nextPresets }
     }),
+  requestExport: () =>
+    set((state) => ({
+      exportCounter: state.exportCounter + 1,
+    })),
 }))

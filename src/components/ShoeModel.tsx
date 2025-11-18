@@ -12,10 +12,11 @@ import {
   Vector3,
 } from 'three'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
+import { OBJExporter } from 'three/examples/jsm/exporters/OBJExporter.js'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { createNoise3D, type NoiseFunction3D } from 'simplex-noise'
 import seedrandom from 'seedrandom'
-import type { NoiseAlgorithm, NoiseParams, NoiseToggles } from '../state/useNoiseStore'
+import { useNoiseStore, type NoiseAlgorithm, type NoiseParams, type NoiseToggles } from '../state/useNoiseStore'
 import { FLOOR_CLEARANCE, FLOOR_Y } from '../constants/environment'
 
 const WELD_TOLERANCE = 1e-4
@@ -362,6 +363,7 @@ interface ShoeModelProps {
 
 export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
   const obj = useLoader(OBJLoader, '/models/BaseShoe.obj')
+  const exportCounter = useNoiseStore((state) => state.exportCounter)
 
   const baseGeometry = useMemo(() => {
     const geometry = gatherGeometry(obj)
@@ -513,6 +515,24 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     params.worleyJitter,
     sculptGeometry,
   ])
+
+  useEffect(() => {
+    if (exportCounter === 0) {
+      return
+    }
+    const exporter = new OBJExporter()
+    const mesh = new Mesh(displacedGeometry.clone())
+    const result = exporter.parse(mesh)
+    const blob = new Blob([result], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `shoeshaper-mesh-${exportCounter}.obj`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }, [exportCounter])
 
   const material = useMemo(
     () =>
