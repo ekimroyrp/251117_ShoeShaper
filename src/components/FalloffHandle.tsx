@@ -7,7 +7,7 @@ import { useNoiseStore } from '../state/useNoiseStore'
 const HANDLE_RADIUS = 0.24
 const LABEL_OFFSET = -1
 const ARROW_OFFSET = 1
-const HEIGHT_DRAG_SCALE = 0.01
+const HEIGHT_DRAG_SCALE = 0.03
 
 export const FalloffHandle = () => {
   const noiseType = useNoiseStore((state) => state.params.noiseType)
