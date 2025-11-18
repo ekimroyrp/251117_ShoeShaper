@@ -73,7 +73,7 @@ export const sliderDefinitions: Record<SliderParamKey, SliderDefinition> = {
   rotateX: { label: 'ROTATE X', min: -360, max: 360, step: 0.05, precision: 2 },
   rotateY: { label: 'ROTATE Y', min: -360, max: 360, step: 0.05, precision: 2 },
   rotateZ: { label: 'ROTATE Z', min: -360, max: 360, step: 0.05, precision: 2 },
-  frequency: { label: 'Frequency', min: 0, max: 4, step: 0.05, precision: 3 },
+  frequency: { label: 'Frequency', min: 0, max: 4, step: 0.05, precision: 2 },
   roughness: { label: 'Roughness', min: 0, max: 1.6, step: 0.05, precision: 2 },
   warp: { label: 'Warp', min: 0, max: 2.5, step: 0.05, precision: 2 },
   ridge: { label: 'Ridge', min: 0, max: 1, step: 0.02, precision: 2 },
@@ -179,7 +179,7 @@ const defaultParams: NoiseParams = {
   clamp: 0.6,
   clampInside: 1,
   offsetX: 0.5,
-  scaleX: 0.5,
+  scaleX: 0.55,
   offsetY: 6.5,
   scaleY: 0.9,
   offsetZ: 4,
@@ -212,10 +212,35 @@ const defaultToggles: NoiseToggles = {
 
 const storageKey = 'shoeshaper-presets'
 
+const sliderMinimums = Object.fromEntries(
+  Object.entries(sliderDefinitions).map(([key, def]) => [key, def.min]),
+) as Partial<Record<SliderParamKey, number>>
+
+const defaultParamBaseline = {
+  seed: 4683,
+  resolution: 1,
+  falloffCenterX: 0,
+  falloffCenterY: FLOOR_Y + 2,
+  falloffCenterZ: -16,
+}
+
 const cloneParams = (params: NoiseParams = defaultParams): NoiseParams => ({
   ...defaultParams,
   ...params,
 })
+
+const buildLeftMostParams = (): NoiseParams => {
+  const leftMost: Partial<NoiseParams> = {}
+  ;(Object.keys(sliderDefinitions) as SliderParamKey[]).forEach((key) => {
+    leftMost[key] = sliderMinimums[key] ?? defaultParams[key]
+  })
+  return {
+    ...defaultParams,
+    ...leftMost,
+    ...defaultParamBaseline,
+    seed: 1,
+  }
+}
 const cloneToggles = (toggles: NoiseToggles): NoiseToggles => ({ ...toggles })
 
 const readPresets = (): SavedPreset[] => {
@@ -297,8 +322,12 @@ export const useNoiseStore = create<NoiseStoreState>((set) => ({
       },
     })),
   resetParams: () =>
-    set(() => ({
-      params: cloneParams(defaultParams),
+    set((state) => ({
+      params: {
+        ...buildLeftMostParams(),
+        resolution: state.params.resolution,
+        noiseType: state.params.noiseType,
+      },
       toggles: cloneToggles(defaultToggles),
       falloffDragging: false,
     })),
