@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { FLOOR_Y } from '../constants/environment'
 
 export const noiseAlgorithms = ['none', 'simplex', 'alligator', 'worley', 'warped', 'curl', 'ridge'] as const
 
@@ -21,6 +22,7 @@ export interface NoiseParams {
   resolution: number
   falloff: number
   falloffCenterX: number
+  falloffCenterY: number
   falloffCenterZ: number
   frequency: number
   roughness: number
@@ -47,7 +49,7 @@ export interface SavedPreset {
 }
 
 type NumericParamKey = Exclude<keyof NoiseParams, 'noiseType'>
-export type SliderParamKey = Exclude<NumericParamKey, 'resolution' | 'falloffCenterX' | 'falloffCenterZ'>
+export type SliderParamKey = Exclude<NumericParamKey, 'resolution' | 'falloffCenterX' | 'falloffCenterY' | 'falloffCenterZ'>
 
 export interface SliderDefinition {
   label: string
@@ -158,6 +160,7 @@ interface NoiseStoreState {
   resetParams: () => void
   toggleFlag: (flag: keyof NoiseToggles) => void
   setFalloffCenter: (x: number, z: number) => void
+  setFalloffHeight: (y: number) => void
   setFalloffDragging: (dragging: boolean) => void
   savePreset: (name: string) => void
   loadPreset: (id: string) => void
@@ -181,6 +184,7 @@ const defaultParams: NoiseParams = {
   resolution: 1,
   falloff: 1.75,
   falloffCenterX: 0,
+  falloffCenterY: FLOOR_Y + 1,
   falloffCenterZ: -16,
   frequency: 0.35,
   roughness: 0.15,
@@ -302,6 +306,13 @@ export const useNoiseStore = create<NoiseStoreState>((set) => ({
         ...state.params,
         falloffCenterX: x,
         falloffCenterZ: z,
+      },
+    })),
+  setFalloffHeight: (y) =>
+    set((state) => ({
+      params: {
+        ...state.params,
+        falloffCenterY: y,
       },
     })),
   setFalloffDragging: (dragging) =>

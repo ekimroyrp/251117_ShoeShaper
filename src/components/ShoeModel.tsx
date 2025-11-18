@@ -394,7 +394,11 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     const noisePoint = new Vector3()
     const clampOutside = Math.max(0, params.clamp ?? 0)
     const clampInside = Math.max(0, params.clampInside ?? 0)
-    const falloffCenter = new Vector3(params.falloffCenterX, FLOOR_Y, params.falloffCenterZ)
+    const falloffCenter = new Vector3(
+      params.falloffCenterX,
+      params.falloffCenterY ?? FLOOR_Y,
+      params.falloffCenterZ,
+    )
     const falloffDistances = new Float32Array(positions.count)
     let maxDistance = 0
 
@@ -488,6 +492,7 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     params.curlStrength,
     params.falloff,
     params.falloffCenterX,
+    params.falloffCenterY,
     params.falloffCenterZ,
     params.frequency,
     params.noiseType,
