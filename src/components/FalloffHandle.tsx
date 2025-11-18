@@ -3,16 +3,11 @@ import type { ThreeEvent } from '@react-three/fiber'
 import { Billboard, Text } from '@react-three/drei'
 import { AdditiveBlending, Plane, Vector3 } from 'three'
 import { useNoiseStore } from '../state/useNoiseStore'
-import { FLOOR_Y } from '../constants/environment'
 
 const HANDLE_RADIUS = 0.24
 const LABEL_OFFSET = -1
 const ARROW_OFFSET = 1
 const HEIGHT_DRAG_SCALE = 0.01
-const HEIGHT_RANGE = 5
-
-const clampHeight = (value: number) =>
-  Math.min(FLOOR_Y + HEIGHT_RANGE, Math.max(FLOOR_Y, value))
 
 export const FalloffHandle = () => {
   const noiseType = useNoiseStore((state) => state.params.noiseType)
@@ -167,9 +162,8 @@ export const FalloffHandle = () => {
           }
           event.stopPropagation()
           const deltaPx = heightPointer.current.startY - event.clientY
-          const targetHeight = clampHeight(
-            heightPointer.current.baseHeight + deltaPx * HEIGHT_DRAG_SCALE,
-          )
+          const targetHeight =
+            heightPointer.current.baseHeight + deltaPx * HEIGHT_DRAG_SCALE
           setFalloffHeight(targetHeight)
         }}
         onPointerUp={endHeightDrag}

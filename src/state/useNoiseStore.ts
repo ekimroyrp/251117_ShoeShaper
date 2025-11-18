@@ -184,7 +184,7 @@ const defaultParams: NoiseParams = {
   resolution: 1,
   falloff: 1.75,
   falloffCenterX: 0,
-  falloffCenterY: FLOOR_Y + 1,
+  falloffCenterY: FLOOR_Y + 2,
   falloffCenterZ: -16,
   frequency: 0.35,
   roughness: 0.15,
