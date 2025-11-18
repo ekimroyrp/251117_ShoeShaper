@@ -23,18 +23,18 @@ export const AxisWidget = () => {
   return (
     <group ref={group} scale={0.35}>
       {/* X axis */}
-      <mesh position={[0.35, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.01, 0.01, 0.7, 8]} />
+      <mesh position={[0.21, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.01, 0.01, 0.42, 8]} />
         <meshBasicMaterial color="#ff4d4d" />
       </mesh>
-      <mesh position={[0.7, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
-        <coneGeometry args={[0.035, 0.12, 12]} />
+      <mesh position={[0.42, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
+        <coneGeometry args={[0.03, 0.16, 12]} />
         <meshBasicMaterial color="#ff4d4d" />
       </mesh>
-      <Billboard position={[0.85, 0, 0]} follow>
+      <Billboard position={[0.55, 0, 0]} follow>
         <Text
           font="/fonts/ShareTechMono-Regular.ttf"
-          fontSize={0.15}
+          fontSize={0.12}
           color="#ff4d4d"
           anchorX="center"
           anchorY="middle"
@@ -46,18 +46,18 @@ export const AxisWidget = () => {
       </Billboard>
 
       {/* Y axis */}
-      <mesh position={[0, 0.35, 0]}>
-        <cylinderGeometry args={[0.01, 0.01, 0.7, 8]} />
+      <mesh position={[0, 0.21, 0]}>
+        <cylinderGeometry args={[0.01, 0.01, 0.42, 8]} />
         <meshBasicMaterial color="#5dff81" />
       </mesh>
-      <mesh position={[0, 0.7, 0]}>
-        <coneGeometry args={[0.035, 0.12, 12]} />
+      <mesh position={[0, 0.42, 0]}>
+        <coneGeometry args={[0.03, 0.16, 12]} />
         <meshBasicMaterial color="#5dff81" />
       </mesh>
-      <Billboard position={[0, 0.85, 0]} follow>
+      <Billboard position={[0, 0.55, 0]} follow>
         <Text
           font="/fonts/ShareTechMono-Regular.ttf"
-          fontSize={0.15}
+          fontSize={0.12}
           color="#5dff81"
           anchorX="center"
           anchorY="middle"
@@ -69,18 +69,18 @@ export const AxisWidget = () => {
       </Billboard>
 
       {/* Z axis */}
-      <mesh position={[0, 0, 0.35]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.01, 0.01, 0.7, 8]} />
+      <mesh position={[0, 0, 0.21]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.01, 0.01, 0.42, 8]} />
         <meshBasicMaterial color="#4d73ff" />
       </mesh>
-      <mesh position={[0, 0, 0.7]} rotation={[Math.PI / 2, 0, 0]}>
-        <coneGeometry args={[0.035, 0.12, 12]} />
+      <mesh position={[0, 0, 0.42]} rotation={[Math.PI / 2, 0, 0]}>
+        <coneGeometry args={[0.03, 0.16, 12]} />
         <meshBasicMaterial color="#4d73ff" />
       </mesh>
-      <Billboard position={[0, 0, 0.85]} follow>
+      <Billboard position={[0, 0, 0.55]} follow>
         <Text
           font="/fonts/ShareTechMono-Regular.ttf"
-          fontSize={0.15}
+          fontSize={0.12}
           color="#4d73ff"
           anchorX="center"
           anchorY="middle"
