@@ -417,9 +417,9 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
       const scaleX = Math.max(0.1, params.scaleX ?? 1)
       const scaleY = Math.max(0.1, params.scaleY ?? 1)
       const scaleZ = Math.max(0.1, params.scaleZ ?? 1)
-      noisePoint.x = (noisePoint.x + params.offsetX) / scaleX
-      noisePoint.y = (noisePoint.y + params.offsetY) / scaleY
-      noisePoint.z = (noisePoint.z + params.offsetZ) / scaleZ
+      noisePoint.x /= scaleX
+      noisePoint.y /= scaleY
+      noisePoint.z /= scaleZ
       if (params.rotateX) {
         const angle = (params.rotateX * Math.PI) / 180
         const cos = Math.cos(angle)
@@ -447,6 +447,9 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
         noisePoint.x = rotatedX
         noisePoint.y = rotatedY
       }
+      noisePoint.x += params.offsetX
+      noisePoint.y += params.offsetY
+      noisePoint.z += params.offsetZ
       const sample = sampleNoise(simplex, params.noiseType, noisePoint, normal, params)
       const normalizedDistance =
         invMaxDistance === 0 ? 0 : Math.min(1, falloffDistances[i] * invMaxDistance)

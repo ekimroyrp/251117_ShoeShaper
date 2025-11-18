@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-export const noiseAlgorithms = ['none', 'simplex', 'ridge', 'warped', 'worley', 'curl', 'alligator'] as const
+export const noiseAlgorithms = ['none', 'simplex', 'alligator', 'worley', 'warped', 'curl', 'ridge'] as const
 
 export type NoiseAlgorithm = (typeof noiseAlgorithms)[number]
 
@@ -68,9 +68,9 @@ export const sliderDefinitions: Record<SliderParamKey, SliderDefinition> = {
   scaleX: { label: 'SCALE X', min: 0.1, max: 5, step: 0.05, precision: 2 },
   scaleY: { label: 'SCALE Y', min: 0.1, max: 5, step: 0.05, precision: 2 },
   scaleZ: { label: 'SCALE Z', min: 0.1, max: 5, step: 0.05, precision: 2 },
-  rotateX: { label: 'ROTATE X', min: -360, max: 360, step: 1, precision: 0 },
-  rotateY: { label: 'ROTATE Y', min: -360, max: 360, step: 1, precision: 0 },
-  rotateZ: { label: 'ROTATE Z', min: -360, max: 360, step: 1, precision: 0 },
+  rotateX: { label: 'ROTATE X', min: -360, max: 360, step: 0.05, precision: 2 },
+  rotateY: { label: 'ROTATE Y', min: -360, max: 360, step: 0.05, precision: 2 },
+  rotateZ: { label: 'ROTATE Z', min: -360, max: 360, step: 0.05, precision: 2 },
   frequency: { label: 'Frequency', min: 0, max: 4, step: 0.05, precision: 3 },
   roughness: { label: 'Roughness', min: 0, max: 1.6, step: 0.05, precision: 2 },
   warp: { label: 'Warp', min: 0, max: 2.5, step: 0.05, precision: 2 },
