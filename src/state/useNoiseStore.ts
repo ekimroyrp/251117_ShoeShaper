@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-export const noiseAlgorithms = ['simplex', 'ridge', 'warped', 'worley', 'curl', 'alligator'] as const
+export const noiseAlgorithms = ['none', 'simplex', 'ridge', 'warped', 'worley', 'curl', 'alligator'] as const
 
 export type NoiseAlgorithm = (typeof noiseAlgorithms)[number]
 
@@ -118,6 +118,7 @@ export const baseSliderKeys: SliderParamKey[] = [
 ]
 
 export const algorithmSliderMap: Record<NoiseAlgorithm, SliderParamKey[]> = {
+  none: [],
   simplex: ['roughness', 'warp'],
   ridge: ['roughness', 'ridge'],
   warped: ['roughness', 'warp'],

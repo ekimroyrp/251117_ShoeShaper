@@ -18,7 +18,7 @@
 4. `npm run build` to emit a production build and type-check through `tsc -b`
 
 ## Controls
-- **Noise Mode** dropdown switches between simplex, ridge, and warped layering styles.
+- **Noise Mode** dropdown now includes a NONE option that bypasses displacement (and hides sliders) plus the usual simplex, ridge, warped, Worley, curl, and alligator modes.
 - **Sliders:** Displacement (amplitude), Frequency, Roughness (octave falloff), Warp (domain warp), Ridge sharpening, Clamp Outside/Inside, Offset X/Y/Z, Scale X/Y/Z, and Seed all map directly to the modifier pipeline.
 - **Clamp Outside / Clamp Inside** sliders independently cap outward and inward displacement, letting you preserve silhouette volume while still carving detail.
 - **Wireframe / Auto Orbit** toggle buttons let you inspect geometry or pause the hero camera sweep.

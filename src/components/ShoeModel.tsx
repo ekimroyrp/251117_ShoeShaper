@@ -337,6 +337,8 @@ const sampleNoise = (
   params: NoiseParams,
 ) => {
   switch (type) {
+    case 'none':
+      return 0
     case 'ridge':
       return layeredSimplex(simplex, 'ridge', point, params)
     case 'warped':

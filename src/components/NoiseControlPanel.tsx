@@ -28,10 +28,15 @@ export const NoiseControlPanel = () => {
   } = useNoiseStore()
   const [presetName, setPresetName] = useState('')
 
-  const sliderKeySet = useMemo(
-    () => new Set<SliderParamKey>([...baseSliderKeys, ...(algorithmSliderMap[params.noiseType] ?? [])]),
-    [params.noiseType],
-  )
+  const sliderKeySet = useMemo(() => {
+    if (params.noiseType === 'none') {
+      return new Set<SliderParamKey>()
+    }
+    return new Set<SliderParamKey>([
+      ...baseSliderKeys,
+      ...(algorithmSliderMap[params.noiseType] ?? []),
+    ])
+  }, [params.noiseType])
   const orderedSliderKeys = useMemo(
     () => sliderOrder.filter((key) => sliderKeySet.has(key)),
     [sliderKeySet],
