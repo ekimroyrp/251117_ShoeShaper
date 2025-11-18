@@ -414,7 +414,8 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
       noisePoint.copy(position)
       noisePoint.x += params.offsetX
       noisePoint.y += params.offsetY
-      noisePoint.z = (noisePoint.z + params.offsetZ) * Math.max(0.1, params.scaleZ ?? 1)
+      const scaleZ = Math.max(0.1, params.scaleZ ?? 1)
+      noisePoint.z = (noisePoint.z + params.offsetZ) / scaleZ
       const sample = sampleNoise(simplex, params.noiseType, noisePoint, normal, params)
       const normalizedDistance =
         invMaxDistance === 0 ? 0 : Math.min(1, falloffDistances[i] * invMaxDistance)
