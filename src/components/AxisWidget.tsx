@@ -27,7 +27,7 @@ export const AxisWidget = () => {
         <cylinderGeometry args={[0.01, 0.01, 0.7, 8]} />
         <meshBasicMaterial color="#ff4d4d" />
       </mesh>
-      <mesh position={[0.7, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+      <mesh position={[0.7, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
         <coneGeometry args={[0.035, 0.12, 12]} />
         <meshBasicMaterial color="#ff4d4d" />
       </mesh>
