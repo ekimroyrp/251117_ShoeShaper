@@ -21,6 +21,33 @@ import { FLOOR_CLEARANCE, FLOOR_Y } from '../constants/environment'
 
 const WELD_TOLERANCE = 1e-4
 
+interface ReactionDiffusionField {
+  size: number
+  values: Float32Array
+}
+
+const REACTION_FIELD_SIZE = 32
+
+const clampValue = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
+
+const wrapCoordinate = (value: number, size: number) => {
+  let wrapped = value % size
+  if (wrapped < 0) {
+    wrapped += size
+  }
+  return wrapped
+}
+
+const wrapIndex = (value: number, size: number) => {
+  let wrapped = value % size
+  if (wrapped < 0) {
+    wrapped += size
+  }
+  return Math.floor(wrapped)
+}
+
+const rdIndex = (size: number, x: number, y: number, z: number) => (z * size + y) * size + x
+
 const weldGeometry = (geometry: BufferGeometry, tolerance = WELD_TOLERANCE) => {
   const position = geometry.getAttribute('position') as BufferAttribute
   const sourceIndex = geometry.index ? geometry.index.array : undefined
@@ -319,6 +346,155 @@ const curlNoise = (
   return magnitude * direction * params.curlStrength
 }
 
+const generateReactionDiffusionField = (params: NoiseParams): ReactionDiffusionField => {
+  const size = REACTION_FIELD_SIZE
+  const total = size * size * size
+  let u = new Float32Array(total)
+  u.fill(1)
+  let v = new Float32Array(total)
+  let uNext = new Float32Array(total)
+  let vNext = new Float32Array(total)
+  const rng = seedrandom(`${params.seed}-reaction`)
+  const feed = clampValue(params.rdFeed ?? 0.037, 0, 0.1)
+  const kill = clampValue(params.rdKill ?? 0.06, 0, 0.1)
+  const diffU = clampValue(params.rdDiffusionU ?? 0.16, 0.001, 1)
+  const diffV = clampValue(params.rdDiffusionV ?? 0.08, 0.001, 1)
+  const iterations = Math.max(1, Math.min(250, Math.round(params.rdIterations ?? 80)))
+  const baseRadius = Math.max(1, Math.floor(size * 0.08))
+  const seedCount = Math.max(4, Math.floor(size * 0.8))
+
+  for (let s = 0; s < seedCount; s += 1) {
+    const cx = Math.floor(rng() * size)
+    const cy = Math.floor(rng() * size)
+    const cz = Math.floor(rng() * size)
+    const radius = baseRadius + Math.floor(rng() * baseRadius)
+    const radiusSq = radius * radius
+    for (let dx = -radius; dx <= radius; dx += 1) {
+      for (let dy = -radius; dy <= radius; dy += 1) {
+        for (let dz = -radius; dz <= radius; dz += 1) {
+          if (dx * dx + dy * dy + dz * dz > radiusSq) {
+            continue
+          }
+          const x = wrapIndex(cx + dx, size)
+          const y = wrapIndex(cy + dy, size)
+          const z = wrapIndex(cz + dz, size)
+          const idx = rdIndex(size, x, y, z)
+          u[idx] = 0.4 + rng() * 0.2
+          v[idx] = 0.5 + rng() * 0.4
+        }
+      }
+    }
+  }
+
+  const laplacian = (arr: Float32Array, x: number, y: number, z: number) => {
+    const xm = wrapIndex(x - 1, size)
+    const xp = wrapIndex(x + 1, size)
+    const ym = wrapIndex(y - 1, size)
+    const yp = wrapIndex(y + 1, size)
+    const zm = wrapIndex(z - 1, size)
+    const zp = wrapIndex(z + 1, size)
+    const sum =
+      arr[rdIndex(size, xm, y, z)] +
+      arr[rdIndex(size, xp, y, z)] +
+      arr[rdIndex(size, x, ym, z)] +
+      arr[rdIndex(size, x, yp, z)] +
+      arr[rdIndex(size, x, y, zm)] +
+      arr[rdIndex(size, x, y, zp)]
+    const center = arr[rdIndex(size, x, y, z)]
+    return sum - center * 6
+  }
+
+  for (let iter = 0; iter < iterations; iter += 1) {
+    for (let z = 0; z < size; z += 1) {
+      for (let y = 0; y < size; y += 1) {
+        for (let x = 0; x < size; x += 1) {
+          const idx = rdIndex(size, x, y, z)
+          const uVal = u[idx]
+          const vVal = v[idx]
+          const uvv = uVal * vVal * vVal
+          const duVal = diffU * laplacian(u, x, y, z) - uvv + feed * (1 - uVal)
+          const dvVal = diffV * laplacian(v, x, y, z) + uvv - (feed + kill) * vVal
+          uNext[idx] = clampValue(uVal + duVal, 0, 1)
+          vNext[idx] = clampValue(vVal + dvVal, 0, 1)
+        }
+      }
+    }
+    ;[u, uNext] = [uNext, u]
+    ;[v, vNext] = [vNext, v]
+  }
+
+  const values = v
+  let min = Infinity
+  let max = -Infinity
+  for (let i = 0; i < values.length; i += 1) {
+    const value = values[i]
+    if (value < min) {
+      min = value
+    }
+    if (value > max) {
+      max = value
+    }
+  }
+  const range = max - min || 1
+  for (let i = 0; i < values.length; i += 1) {
+    values[i] = (values[i] - min) / range
+  }
+
+  return { size, values }
+}
+
+const trilinearSample = (field: ReactionDiffusionField, x: number, y: number, z: number) => {
+  const size = field.size
+  const values = field.values
+  const x0 = Math.floor(x)
+  const y0 = Math.floor(y)
+  const z0 = Math.floor(z)
+  const x1 = (x0 + 1) % size
+  const y1 = (y0 + 1) % size
+  const z1 = (z0 + 1) % size
+  const fx = x - x0
+  const fy = y - y0
+  const fz = z - z0
+
+  const sample = (ix: number, iy: number, iz: number) => values[rdIndex(size, ix, iy, iz)]
+
+  const c000 = sample(x0, y0, z0)
+  const c100 = sample(x1, y0, z0)
+  const c010 = sample(x0, y1, z0)
+  const c110 = sample(x1, y1, z0)
+  const c001 = sample(x0, y0, z1)
+  const c101 = sample(x1, y0, z1)
+  const c011 = sample(x0, y1, z1)
+  const c111 = sample(x1, y1, z1)
+
+  const c00 = c000 * (1 - fx) + c100 * fx
+  const c10 = c010 * (1 - fx) + c110 * fx
+  const c01 = c001 * (1 - fx) + c101 * fx
+  const c11 = c011 * (1 - fx) + c111 * fx
+
+  const c0 = c00 * (1 - fy) + c10 * fy
+  const c1 = c01 * (1 - fy) + c11 * fy
+
+  return c0 * (1 - fz) + c1 * fz
+}
+
+const reactionDiffusionNoise = (
+  field: ReactionDiffusionField | null,
+  point: Vector3,
+  params: NoiseParams,
+) => {
+  if (!field) {
+    return 0
+  }
+  const size = field.size
+  const frequency = Math.max(0.0001, params.frequency)
+  const scaledX = wrapCoordinate(point.x * frequency, size)
+  const scaledY = wrapCoordinate(point.y * frequency, size)
+  const scaledZ = wrapCoordinate(point.z * frequency, size)
+  const value = trilinearSample(field, scaledX, scaledY, scaledZ)
+  return value * 2 - 1
+}
+
 const alligatorNoise = (simplex: NoiseFunction3D, point: Vector3, params: NoiseParams) => {
   const freq = Math.max(0.0001, params.frequency)
   const scaled = point.clone().multiplyScalar(freq)
@@ -336,6 +512,7 @@ const sampleNoise = (
   point: Vector3,
   normal: Vector3,
   params: NoiseParams,
+  reactionField: ReactionDiffusionField | null,
 ) => {
   switch (type) {
     case 'none':
@@ -348,6 +525,8 @@ const sampleNoise = (
       return worleyNoise(point, params, params.seed)
     case 'curl':
       return curlNoise(simplex, point, normal, params)
+    case 'reaction':
+      return reactionDiffusionNoise(reactionField, point, params)
     case 'alligator':
       return alligatorNoise(simplex, point, params)
     case 'simplex':
@@ -387,6 +566,21 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     welded.computeVertexNormals()
     return welded
   }, [baseGeometry, params.resolution])
+
+  const reactionField = useMemo(() => {
+    if (params.noiseType !== 'reaction') {
+      return null
+    }
+    return generateReactionDiffusionField(params)
+  }, [
+    params.noiseType,
+    params.rdFeed,
+    params.rdKill,
+    params.rdDiffusionU,
+    params.rdDiffusionV,
+    params.rdIterations,
+    params.seed,
+  ])
 
   const displacedGeometry = useMemo(() => {
     const geometry = sculptGeometry.clone()
@@ -459,7 +653,14 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
       noisePoint.x += params.offsetX
       noisePoint.y += params.offsetY
       noisePoint.z += params.offsetZ
-      const sample = sampleNoise(simplex, params.noiseType, noisePoint, normal, params)
+      const sample = sampleNoise(
+        simplex,
+        params.noiseType,
+        noisePoint,
+        normal,
+        params,
+        reactionField,
+      )
       const normalizedDistance =
         invMaxDistance === 0 ? 0 : Math.min(1, falloffDistances[i] * invMaxDistance)
       const falloffWeight = Math.pow(normalizedDistance, falloffExponent)
@@ -565,12 +766,18 @@ export const ShoeModel = ({ params, toggles }: ShoeModelProps) => {
     params.scaleY,
     params.scaleZ,
     params.ridge,
+    params.rdDiffusionU,
+    params.rdDiffusionV,
+    params.rdFeed,
+    params.rdIterations,
+    params.rdKill,
     params.roughness,
     params.seed,
     params.warp,
     params.worleyBlend,
     params.worleyJitter,
     params.smoothing,
+    reactionField,
     sculptGeometry,
   ])
 

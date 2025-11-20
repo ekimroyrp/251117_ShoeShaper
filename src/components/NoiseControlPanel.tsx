@@ -3,6 +3,7 @@ import { CyberSlider } from './CyberSlider'
 import {
   algorithmSliderMap,
   baseSliderKeys,
+  type NoiseAlgorithm,
   noiseAlgorithms,
   resolutionOptions,
   sliderDefinitions,
@@ -11,6 +12,17 @@ import {
   useNoiseStore,
 } from '../state/useNoiseStore'
 import { SelectField } from './SelectField'
+
+const noiseLabels: Record<NoiseAlgorithm, string> = {
+  none: 'NONE',
+  simplex: 'SIMPLEX',
+  alligator: 'ALLIGATOR',
+  reaction: 'REACTION DIFFUSION',
+  worley: 'WORLEY',
+  warped: 'WARPED',
+  curl: 'CURL',
+  ridge: 'RIDGE',
+}
 
 export const NoiseControlPanel = () => {
   const {
@@ -66,7 +78,7 @@ export const NoiseControlPanel = () => {
         value={params.noiseType}
         onSelect={(next) => setNoiseType(next)}
         options={noiseAlgorithms.map((algorithm) => ({
-          label: algorithm.toUpperCase(),
+          label: noiseLabels[algorithm] ?? algorithm.toUpperCase(),
           value: algorithm,
         }))}
       />

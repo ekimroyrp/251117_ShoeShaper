@@ -10,7 +10,7 @@
 - Parameter store tracks amplitude, frequency, roughness (octave falloff), warp, ridge strength, smoothing, Clamp Outside/Inside, offsets, per-axis scaling/rotation, wireframe, autorotation, and tooltip overlays so UI + scene stay in sync.
 - Canvas scene ships with HDR environment, dual key lights, stats overlay, axis-orientation widget, and a draggable falloff gizmo (sphere + height arrow + label) that matches screenshot/export visibility rules.
 - Export Mesh and Take Screenshot buttons live in a unified button grid, capture OBJ / PNGs to disk, and omit helper gizmos (falloff handle + axis widget) for clean outputs.
-- Algorithm-specific sliders (Worley Shift/Blend, Curl Strength/Detail, Alligator Wave/Crunch, etc.) directly remap the sculpted surface so every noise mode has responsive controls.
+- Algorithm-specific sliders (Worley Shift/Blend, Curl Strength/Detail, Alligator Wave/Crunch, Reaction Feed/Kill/Diffusion/Iterations, etc.) directly remap the sculpted surface so every noise mode has responsive controls.
 
 ## Getting Started
 1. `npm install`
@@ -19,7 +19,7 @@
 4. `npm run build` to emit a production build and type-check through `tsc -b`
 
 ## Controls
-- **Noise Mode** dropdown now includes a NONE option that bypasses displacement (and hides sliders) plus the usual simplex, ridge, warped, Worley, curl, and alligator modes.
+- **Noise Mode** dropdown now includes a NONE option that bypasses displacement (and hides sliders) plus simplex, ridge, warped, Worley, curl, alligator, and the new Reaction Diffusion generator for Gray–Scott style patterns.
 - **Sliders:** Displacement (amplitude), Frequency, Roughness (octave falloff), Warp (domain warp), Ridge sharpening, Smoothing, Clamp Outside/Inside, Offset X/Y/Z, Scale X/Y/Z, Rotate X/Y/Z, and Seed all map directly to the modifier pipeline.
 - **Clamp Outside / Clamp Inside** sliders independently cap outward and inward displacement, letting you preserve silhouette volume while still carving detail.
 - **Wireframe / Auto Orbit** toggle buttons let you inspect geometry or pause the hero camera sweep.

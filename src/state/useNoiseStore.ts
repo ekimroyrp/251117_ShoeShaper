@@ -1,7 +1,16 @@
 import { create } from 'zustand'
 import { FLOOR_Y } from '../constants/environment'
 
-export const noiseAlgorithms = ['none', 'simplex', 'alligator', 'worley', 'warped', 'curl', 'ridge'] as const
+export const noiseAlgorithms = [
+  'none',
+  'simplex',
+  'alligator',
+  'reaction',
+  'worley',
+  'warped',
+  'curl',
+  'ridge',
+] as const
 
 export type NoiseAlgorithm = (typeof noiseAlgorithms)[number]
 
@@ -35,6 +44,11 @@ export interface NoiseParams {
   curlScale: number
   alligatorBite: number
   alligatorPlateau: number
+  rdFeed: number
+  rdKill: number
+  rdDiffusionU: number
+  rdDiffusionV: number
+  rdIterations: number
   noiseType: NoiseAlgorithm
 }
 
@@ -86,6 +100,11 @@ export const sliderDefinitions: Record<SliderParamKey, SliderDefinition> = {
   curlScale: { label: 'DETAIL', min: 0.1, max: 3, step: 0.05, precision: 2 },
   alligatorBite: { label: 'WAVE', min: 0, max: 3, step: 0.05, precision: 2 },
   alligatorPlateau: { label: 'CRUNCH', min: 0, max: 1, step: 0.02, precision: 2 },
+  rdFeed: { label: 'FEED', min: 0, max: 0.1, step: 0.001, precision: 3 },
+  rdKill: { label: 'KILL', min: 0, max: 0.1, step: 0.001, precision: 3 },
+  rdDiffusionU: { label: 'DIFFUSE U', min: 0.01, max: 1, step: 0.01, precision: 2 },
+  rdDiffusionV: { label: 'DIFFUSE V', min: 0.01, max: 1, step: 0.01, precision: 2 },
+  rdIterations: { label: 'ITERATIONS', min: 1, max: 250, step: 1, precision: 0 },
 }
 
 export const sliderOrder: SliderParamKey[] = [
@@ -103,6 +122,11 @@ export const sliderOrder: SliderParamKey[] = [
   'curlScale',
   'alligatorBite',
   'alligatorPlateau',
+  'rdFeed',
+  'rdKill',
+  'rdDiffusionU',
+  'rdDiffusionV',
+  'rdIterations',
   'smoothing',
   'offsetX',
   'offsetY',
@@ -140,6 +164,7 @@ export const algorithmSliderMap: Record<NoiseAlgorithm, SliderParamKey[]> = {
   simplex: ['roughness', 'warp'],
   ridge: ['roughness', 'ridge'],
   warped: ['roughness', 'warp'],
+  reaction: ['rdFeed', 'rdKill', 'rdDiffusionU', 'rdDiffusionV', 'rdIterations'],
   worley: ['worleyJitter', 'worleyBlend'],
   curl: ['curlScale', 'curlStrength'],
   alligator: ['alligatorBite', 'alligatorPlateau'],
@@ -207,6 +232,11 @@ const defaultParams: NoiseParams = {
   curlScale: 1,
   alligatorBite: 2,
   alligatorPlateau: 0.12,
+  rdFeed: 0.065,
+  rdKill: 0.042,
+  rdDiffusionU: 0.04,
+  rdDiffusionV: 0.04,
+  rdIterations: 90,
   noiseType: 'simplex',
 }
 
