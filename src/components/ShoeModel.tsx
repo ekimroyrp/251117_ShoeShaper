@@ -27,6 +27,7 @@ interface ReactionDiffusionField {
 }
 
 const REACTION_FIELD_SIZE = 32
+const REACTION_FREQ_MULTIPLIER = 11
 
 const clampValue = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
@@ -487,7 +488,7 @@ const reactionDiffusionNoise = (
     return 0
   }
   const size = field.size
-  const frequency = Math.max(0.0001, params.frequency)
+  const frequency = Math.max(0.0001, params.frequency * REACTION_FREQ_MULTIPLIER)
   const scaledX = wrapCoordinate(point.x * frequency, size)
   const scaledY = wrapCoordinate(point.y * frequency, size)
   const scaledZ = wrapCoordinate(point.z * frequency, size)
